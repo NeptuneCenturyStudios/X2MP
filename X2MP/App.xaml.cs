@@ -5,7 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-//using X2MP.System;
+using X2MP.Core;
 
 namespace X2MP
 {
@@ -17,14 +17,23 @@ namespace X2MP
         /// <summary>
         /// Gets the static reference to the sound engine (FMOD)
         /// </summary>
-        //public static SoundEngine SoundEngine { get; private set; }
+        public static SoundEngine SoundEngine { get; private set; }
 
         /// <summary>
         /// Constructor
         /// </summary>
         public App()
         {
-            //SoundEngine = new SoundEngine();
+            //initialize instance of FMOD engine
+            SoundEngine = new SoundEngine();
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            //shutdown fmod
+            SoundEngine.Dispose();
+
+            base.OnExit(e);
         }
     }
 }
