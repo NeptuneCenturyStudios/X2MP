@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "X2MP", "X2MP\X2MP.csproj", "{A2632161-C85F-4686-AA05-7B9A0E43B98C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "X2MP.Core", "X2MP.Core\X2MP.Core.csproj", "{FE36F7DC-F909-490B-AE93-598E0E2D1AC9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A2632161-C85F-4686-AA05-7B9A0E43B98C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2632161-C85F-4686-AA05-7B9A0E43B98C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2632161-C85F-4686-AA05-7B9A0E43B98C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2632161-C85F-4686-AA05-7B9A0E43B98C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE36F7DC-F909-490B-AE93-598E0E2D1AC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE36F7DC-F909-490B-AE93-598E0E2D1AC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE36F7DC-F909-490B-AE93-598E0E2D1AC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE36F7DC-F909-490B-AE93-598E0E2D1AC9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
