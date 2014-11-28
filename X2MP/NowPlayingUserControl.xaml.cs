@@ -12,20 +12,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using X2MP.Models;
 
 namespace X2MP
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for NowPlayingUserControl.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class NowPlayingUserControl : UserControl
     {
-        public MainWindow()
+        public NowPlayingUserControl()
         {
             InitializeComponent();
-            //initialize our view model
-            this.DataContext = new MainWindowViewModel(this);
         }
     }
 }

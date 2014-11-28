@@ -15,17 +15,35 @@
 
             <!--define a section for our controls which will always be visible-->
             <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
 
-            <!--grid for everything else-->
+            <!--grid for menu items-->
             <Grid Grid.Row="0">
+                <StackPanel Orientation="Horizontal">
+                    
+                    <Button>
+                        Collection
+                    </Button>
 
+                    <Button Command="{Binding OpenNowPlaying}">
+                        Now Playing
+                    </Button>
+                    
+                </StackPanel>
+            </Grid>
+            
+            <!--grid for everything else-->
+            <Grid Grid.Row="1" >
+               
+                <ContentControl Content="{Binding Component}"/>
+               
             </Grid>
 
             <!--controls-->
-            <Grid Grid.Row="1" HorizontalAlignment="Center">
+            <Grid Grid.Row="2" HorizontalAlignment="Center">
                 <StackPanel Orientation="Horizontal">
                     <Button Style="{StaticResource ControlButton}" >
                         A
@@ -39,6 +57,7 @@
                 </StackPanel>
 
             </Grid>
+
 
         </Grid>
     </Border>
