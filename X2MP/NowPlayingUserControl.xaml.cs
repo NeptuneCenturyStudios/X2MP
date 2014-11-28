@@ -24,5 +24,10 @@ namespace X2MP
         {
             InitializeComponent();
         }
+
+        private void Grid_Drop(object sender, DragEventArgs e)
+        {
+
+        }
     }
 }
