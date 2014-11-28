@@ -1,8 +1,46 @@
 ﻿<Window x:Class="X2MP.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="380" Width="660" ResizeMode="CanResizeWithGrip">
-    <Grid >
+        Title="X2 Media Player"
+        Height="400"
+        Width="650" 
+        ResizeMode="CanResizeWithGrip"
+        MinWidth="325"
+        MinHeight="200"
+        Style="{StaticResource WindowStyle}">
 
-    </Grid>
+    <!--main border around window-->
+    <Border BorderThickness="1" BorderBrush="CornflowerBlue">
+        <Grid>
+
+            <!--define a section for our controls which will always be visible-->
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+
+            <!--grid for everything else-->
+            <Grid Grid.Row="0">
+
+            </Grid>
+
+            <!--controls-->
+            <Grid Grid.Row="1" HorizontalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <Button Style="{StaticResource ControlButton}" >
+                        A
+                    </Button>
+                    <Button Style="{StaticResource ControlButtonLarge}" >
+                        B
+                    </Button>
+                    <Button Style="{StaticResource ControlButton}" >
+                        C
+                    </Button>
+                </StackPanel>
+
+            </Grid>
+
+        </Grid>
+    </Border>
+
 </Window>
