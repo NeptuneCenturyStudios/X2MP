@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Data;
 using System.Linq;
@@ -20,12 +21,21 @@ namespace X2MP
         public static SoundEngine SoundEngine { get; private set; }
 
         /// <summary>
+        /// Gets the currently playing playlist. This is global because it has to persist all the time
+        /// </summary>
+        public static ObservableCollection<String> NowPlaying { get; private set; }
+
+        /// <summary>
         /// Constructor
         /// </summary>
         public App()
         {
+            //initialize the playlist
+            NowPlaying = new ObservableCollection<string>();
+
             //initialize instance of FMOD engine
             SoundEngine = new SoundEngine();
+            
         }
 
         protected override void OnExit(ExitEventArgs e)

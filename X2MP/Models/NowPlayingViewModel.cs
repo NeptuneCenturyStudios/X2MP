@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace X2MP.Models
@@ -16,12 +17,18 @@ namespace X2MP.Models
         #region Properties
 
         /// <summary>
-        /// Gets the currently playing playlist
+        /// Gets the playlist
         /// </summary>
-        public ObservableCollection<String> NowPlaying { get; private set; }
+        public ObservableCollection<String> NowPlaying
+        {
+            get
+            {
+                return App.NowPlaying;
+            }
+        }
 
         #region Commands
-        public ICommand Drop { get; private set; }
+        
         #endregion
 
         #endregion
@@ -29,15 +36,35 @@ namespace X2MP.Models
         #region Constructor
         public NowPlayingViewModel()
         {
-            NowPlaying = new ObservableCollection<string>();
+            
+        }
+        #endregion
+
+        #region Methods
+        public void Drop(object sender, DragEventArgs e)
+        {
+            //check to see what the user dropped on top of us
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                //get the files we have dropped
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                //filter out files that we don't support
+
+                //add files to the playlist
+                foreach(var file in files){
+                    NowPlaying.Add(file);
+                }
+            }
         }
         #endregion
 
         #region Register Commands
         private void RegisterCommands()
         {
-            Drop = new Command((parameter) => { });
+            
         }
         #endregion
+
     }
 }

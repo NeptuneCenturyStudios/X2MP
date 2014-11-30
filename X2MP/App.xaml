@@ -46,5 +46,12 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        
+        <!--text styles-->
+        <Style TargetType="TextBlock" x:Key="MediumText">
+            <Setter Property="FontFamily" Value="Segoe UI Light"/>
+            <Setter Property="FontSize" Value="16px" />
+        </Style>
+        
     </Application.Resources>
 </Application>

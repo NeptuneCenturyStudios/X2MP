@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using X2MP.Models;
 
 namespace X2MP
 {
@@ -23,11 +24,25 @@ namespace X2MP
         public NowPlayingUserControl()
         {
             InitializeComponent();
+
+            //view model
+            this.DataContext = new NowPlayingViewModel();
         }
 
         private void Grid_Drop(object sender, DragEventArgs e)
         {
+            //get the model
+            var model = this.DataContext as NowPlayingViewModel;
 
+            //handle with model
+            model.Drop(sender, e);
+
+        }
+
+        private void Grid_DragOver(object sender, DragEventArgs e)
+        {
+            e.Effects= DragDropEffects.Move;
+            
         }
     }
 }

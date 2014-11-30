@@ -38,7 +38,8 @@
             <!--grid for everything else-->
             <Grid Grid.Row="1" >
                
-                <ContentControl Content="{Binding Component}"/>
+                <ContentControl Content="{Binding Component}"
+                                Margin="10"/>
                
             </Grid>
 

@@ -6,7 +6,19 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid AllowDrop="True"
-          Drop="{Binding Drop}">
-    
+          DragOver="Grid_DragOver"
+          Drop="Grid_Drop">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Drop files here or add them from your collection" 
+                   Style="{StaticResource MediumText}" Foreground="Gray" HorizontalAlignment="Center" />
+
+        <ListView Grid.Row="1" ItemsSource="{ Binding NowPlaying }">
+
+        </ListView>
     </Grid>
 </UserControl>
