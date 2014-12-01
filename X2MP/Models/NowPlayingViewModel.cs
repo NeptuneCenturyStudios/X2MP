@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using X2MP.Core;
 
 namespace X2MP.Models
 {
@@ -19,11 +20,11 @@ namespace X2MP.Models
         /// <summary>
         /// Gets the playlist
         /// </summary>
-        public ObservableCollection<String> NowPlaying
+        public PlayList NowPlaying
         {
             get
             {
-                return App.NowPlaying;
+                return App.SoundEngine.NowPlaying;
             }
         }
 

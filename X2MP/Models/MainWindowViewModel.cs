@@ -41,6 +41,9 @@ namespace X2MP.Models
         /// Gets the command for the now playing button
         /// </summary>
         public ICommand OpenNowPlaying { get; private set; }
+
+        public ICommand Play { get; private set; }
+
         #endregion
 
         #region Constructor
@@ -65,6 +68,10 @@ namespace X2MP.Models
             {
                 //display the Now Playing component
                 Component = new NowPlayingUserControl();
+            });
+
+            Play = new Command((parameter) => {
+                App.SoundEngine.Play();
             });
         }
         #endregion

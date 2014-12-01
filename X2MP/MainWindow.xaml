@@ -49,7 +49,8 @@
                     <Button Style="{StaticResource ControlButton}" >
                         A
                     </Button>
-                    <Button Style="{StaticResource ControlButtonLarge}" >
+                    <Button Style="{StaticResource ControlButtonLarge}"
+                            Command="{Binding Play}">
                         B
                     </Button>
                     <Button Style="{StaticResource ControlButton}" >
