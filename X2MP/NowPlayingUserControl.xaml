@@ -18,7 +18,11 @@
                    Style="{StaticResource MediumText}" Foreground="Gray" HorizontalAlignment="Center" />
 
         <ListView Grid.Row="1" ItemsSource="{ Binding NowPlaying }">
-
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Artist" DisplayMemberBinding="{Binding TagInfo.Artist}" />
+                </GridView>
+            </ListView.View>
         </ListView>
     </Grid>
 </UserControl>

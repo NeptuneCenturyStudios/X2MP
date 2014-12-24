@@ -29,15 +29,15 @@ namespace X2MP.Models
         }
 
         #region Commands
-        
+
         #endregion
 
         #endregion
-        
+
         #region Constructor
         public NowPlayingViewModel()
         {
-            
+
         }
         #endregion
 
@@ -53,8 +53,15 @@ namespace X2MP.Models
                 //filter out files that we don't support
 
                 //add files to the playlist
-                foreach(var file in files){
-                    NowPlaying.Add(file);
+                foreach (var file in files)
+                {
+
+                    var tagReader = new TagReader();
+                    var tagInfo = tagReader.ReadTags(file);
+                    var playlistEntry = new PlaylistEntry() { TagInfo = tagInfo, FileName = file };
+
+                    NowPlaying.Add(playlistEntry);
+
                 }
             }
         }
@@ -63,7 +70,7 @@ namespace X2MP.Models
         #region Register Commands
         private void RegisterCommands()
         {
-            
+
         }
         #endregion
 

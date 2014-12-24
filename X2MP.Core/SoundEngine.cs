@@ -77,7 +77,7 @@ namespace X2MP.Core
                 //create the internal playlist
                 foreach (var item in NowPlaying)
                 {
-                    InternalPlayList.Add(new MediaInfo() { FileName = item });
+                    InternalPlayList.Add(new MediaInfo() { FileName = item.FileName });
                 }
 
 
