@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace X2MP.Core
 {
-    public class PlayList : ObservableCollection<PlaylistEntry>
+    public class PlayList : ObservableCollection<PlayListEntry>
     {
     }
 }

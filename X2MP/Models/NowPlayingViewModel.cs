@@ -52,16 +52,24 @@ namespace X2MP.Models
 
                 //filter out files that we don't support
 
-                //add files to the playlist
-                foreach (var file in files)
+                //tag reader
+                using (var tagReader = new TagReader())
                 {
 
-                    var tagReader = new TagReader();
-                    var tagInfo = tagReader.ReadTags(file);
-                    var playlistEntry = new PlaylistEntry() { TagInfo = tagInfo, FileName = file };
+                    //add files to the playlist
+                    foreach (var file in files)
+                    {
 
-                    NowPlaying.Add(playlistEntry);
+                        //read the tag
+                        var tagInfo = tagReader.ReadTags(file);
 
+                        //create playlist entry
+                        var playlistEntry = new PlayListEntry() { TagInfo = tagInfo, FileName = file };
+
+                        //add to now playing
+                        NowPlaying.Add(playlistEntry);
+
+                    }
                 }
             }
         }

@@ -20,7 +20,10 @@
         <ListView Grid.Row="1" ItemsSource="{ Binding NowPlaying }">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Artist" DisplayMemberBinding="{Binding TagInfo.Artist}" />
+                    <GridViewColumn Header="Track" Width="50" DisplayMemberBinding="{Binding TagInfo.Track}" />
+                    <GridViewColumn Header="Title" Width="250" DisplayMemberBinding="{Binding TagInfo.Title}" />
+                    <GridViewColumn Header="Album" Width="150" DisplayMemberBinding="{Binding TagInfo.Album}" />
+                    <GridViewColumn Header="Artist" Width="150" DisplayMemberBinding="{Binding TagInfo.Artist}" />
                 </GridView>
             </ListView.View>
         </ListView>

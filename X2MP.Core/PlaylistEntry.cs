@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace X2MP.Core
 {
-    public class PlaylistEntry
+    public class PlayListEntry
     {
         /// <summary>
         /// Gets or sets the tag info

@@ -11,7 +11,7 @@ namespace X2MP.Core
     /// <summary>
     /// Reads the tag information in an audio file
     /// </summary>
-    public class TagReader
+    public class TagReader : IDisposable
     {
 
         FMOD.System _system;
@@ -20,27 +20,36 @@ namespace X2MP.Core
         public struct ASFFrames
         {
             public const string ARTIST = "WM/AlbumArtist";
+            public const string ALBUM = "WM/AlbumTitle";
+            public const string TITLE = "TITLE";
+            public const string TRACK = "WM/TrackNumber";
         }
 
         public struct ID3v1Frames
         {
             public const string ARTIST = "ARTIST";
+            public const string ALBUM = "ALBUM";
+            public const string TITLE = "TITLE";
+            public const string TRACK = "TRACK";
         }
 
         public struct ID3v2Frames
         {
             public const string ARTIST = "TPE1";
+            public const string ALBUM = "TALB";
+            public const string TITLE = "TIT2";
+            public const string TRACK = "TRCK";
         }
         #endregion
 
-        
+
         /// <summary>
         /// Constructor
         /// </summary>
         public TagReader()
         {
 
-            
+
             FMOD.RESULT result;
 
             //create an fmod instance to use for tag reading
@@ -49,14 +58,15 @@ namespace X2MP.Core
             result = _system.init(1, FMOD.INITFLAGS.NORMAL, IntPtr.Zero);
             CheckError(result);
 
-            
+
         }
 
         /// <summary>
         /// Reads the tag of a file
         /// </summary>
         /// <param name="filename"></param>
-        public TagInfo ReadTags(string filename){
+        public TagInfo ReadTags(string filename)
+        {
             //if ok, create a sound with tag support
             FMOD.RESULT result;
             FMOD.Sound snd;
@@ -114,7 +124,7 @@ namespace X2MP.Core
         /// <returns></returns>
         private void SetSongInfo(FMOD.TAG tag, TagInfo tagInfo)
         {
-            
+
             string data = null;
 
             if (tag.datatype == FMOD.TAGDATATYPE.STRING)
@@ -125,7 +135,11 @@ namespace X2MP.Core
             {
                 data = Marshal.PtrToStringUni(tag.data);
             }
-            
+            else if (tag.datatype == FMOD.TAGDATATYPE.INT)
+            {
+                data = Marshal.ReadInt32(tag.data).ToString();
+            }
+
 
             if (tag.type == FMOD.TAGTYPE.ASF)
             {
@@ -135,7 +149,15 @@ namespace X2MP.Core
                     case ASFFrames.ARTIST:
                         tagInfo.Artist = data;
                         break;
-
+                    case ASFFrames.ALBUM:
+                        tagInfo.Album = data;
+                        break;
+                    case ASFFrames.TITLE:
+                        tagInfo.Title = data;
+                        break;
+                    case ASFFrames.TRACK:
+                        tagInfo.Track = data;
+                        break;
                     default:
                         break;
                 }
@@ -152,14 +174,44 @@ namespace X2MP.Core
                         case ID3v1Frames.ARTIST:
                             tagInfo.Artist = data;
                             break;
+                        case ID3v1Frames.ALBUM:
+                            tagInfo.Album = data;
+                            break;
+                        case ID3v1Frames.TITLE:
+                            tagInfo.Title = data;
+                            break;
+                        case ID3v1Frames.TRACK:
+                            tagInfo.Track = data;
+                            break;
+                        default:
+                            break;
+                    }
+                }
 
+                if (tag.type == FMOD.TAGTYPE.ID3V2)
+                {
+                    //where does it go?
+                    switch (tag.name)
+                    {
+                        case ID3v2Frames.ARTIST:
+                            tagInfo.Artist = data;
+                            break;
+                        case ID3v2Frames.ALBUM:
+                            tagInfo.Album = data;
+                            break;
+                        case ID3v2Frames.TITLE:
+                            tagInfo.Title = data;
+                            break;
+                        case ID3v1Frames.TRACK:
+                            tagInfo.Track = data;
+                            break;
                         default:
                             break;
                     }
                 }
             }
 
-            
+
         }
 
         #region Helper Methods
@@ -174,5 +226,16 @@ namespace X2MP.Core
             }
         }
         #endregion
+
+        public void Dispose()
+        {
+            if (_system != null)
+            {
+                _system.close();
+                _system.release();
+
+                _system = null;
+            }
+        }
     }
 }
