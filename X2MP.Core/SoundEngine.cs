@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +13,17 @@ namespace X2MP.Core
     public class SoundEngine : IDisposable
     {
 
-        FMOD.System _system;
+        /// <summary>
+        /// FMOD system object
+        /// </summary>
+        private FMOD.System _system;
+
+
+        /// <summary>
+        /// Stores information to control playback. This structure will be passed to callbacks
+        /// </summary>
+        SoundSystemControl _control;
+        GCHandle _controlHandle;
 
         /// <summary>
         /// Gets the currently playing playlist.
@@ -29,6 +40,9 @@ namespace X2MP.Core
         /// </summary>
         public SoundEngine()
         {
+            //create sound system control struct
+            _control = new SoundSystemControl();
+            _controlHandle = GCHandle.Alloc(_control, GCHandleType.Pinned);
 
             //initialize the playlist
             NowPlaying = new PlayList();
@@ -61,6 +75,9 @@ namespace X2MP.Core
                 //release system
                 result = _system.release();
                 CheckError(result);
+
+                //free handles
+                _controlHandle.Free();
             }
         }
 
@@ -104,9 +121,10 @@ namespace X2MP.Core
 
             //result
             FMOD.RESULT result;
+            FMOD.CREATESOUNDEXINFO exInfo = new FMOD.CREATESOUNDEXINFO();
 
             //create a stream non-blocking
-            result = this._system.createStream(media.FileName, FMOD.MODE.CREATESTREAM | FMOD.MODE._2D | FMOD.MODE.NONBLOCKING, out media.Sound);
+            result = this._system.createStream(media.FileName, FMOD.MODE.CREATESTREAM | FMOD.MODE._2D | FMOD.MODE.NONBLOCKING, ref exInfo, out media.Sound);
             CheckError(result);
 
             //we have to check status to determine when the sound is ready to be played
@@ -123,6 +141,7 @@ namespace X2MP.Core
                     //wait
                     Thread.Sleep(1);
                 }
+
 
             });
 
@@ -134,23 +153,40 @@ namespace X2MP.Core
             FMOD.RESULT result;
             FMOD.Channel channel;
 
-            result = this._system.playSound(media.Sound, null, false, out channel);
+            result = this._system.playSound(media.Sound, null, true, out channel);
             CheckError(result);
+
+            //create callback
+            result = channel.setCallback(ChannelCallback);
+            CheckError(result);
+
+            //get pointer to class
+            var ctrlPtr = GCHandle.ToIntPtr(_controlHandle);
+            //set user data
+            result = channel.setUserData(ctrlPtr);
+            CheckError(result);
+
+            //unpause when ready to begin playing
+            result = channel.setPaused(false);
 
             //we have to check status to determine when the sound is ready to be played
             await Task.Run(() =>
             {
-                //update the open state of the media
-                media.UpdateOpenState();
+                _control.IsPlaying = true;
                 //check the open state of the media
-                while (media.OpenState != FMOD.OPENSTATE.READY && media.OpenState != FMOD.OPENSTATE.ERROR)
+                while (_control.IsPlaying)
                 {
                     //update the open state of the media
                     media.UpdateOpenState();
 
+                    //we must call this once per frame
+                    _system.update();
+
                     //wait
                     Thread.Sleep(1);
                 }
+
+                var i = 0;
 
             });
         }
@@ -167,6 +203,39 @@ namespace X2MP.Core
                 //throw the error
                 throw new Exception(error);
             }
+        }
+        #endregion
+
+        #region Callback
+
+        /// <summary>
+        /// Handles channel callbacks
+        /// </summary>
+        /// <param name="channelraw"></param>
+        /// <param name="controltype"></param>
+        /// <param name="type"></param>
+        /// <param name="commanddata1"></param>
+        /// <param name="commanddata2"></param>
+        /// <returns></returns>
+        private static FMOD.RESULT ChannelCallback(IntPtr channelraw, FMOD.CHANNELCONTROL_TYPE controltype, FMOD.CHANNELCONTROL_CALLBACK_TYPE type, IntPtr commanddata1, IntPtr commanddata2)
+        {
+
+            if (type == FMOD.CHANNELCONTROL_CALLBACK_TYPE.END)
+            {
+                //create a channel object from a pointer
+                FMOD.Channel channel = new FMOD.Channel(channelraw);
+
+                //get user data
+                IntPtr data;
+                FMOD.RESULT result = channel.getUserData(out data);
+
+                //get the playback control
+                var control = (SoundSystemControl)GCHandle.FromIntPtr(data).Target;
+                
+                control.IsPlaying = false;
+            }
+
+            return FMOD.RESULT.OK;
         }
         #endregion
     }
