@@ -23,7 +23,7 @@ namespace X2MP.Tests
             for (int x = 0; x < 10000000; x++)
             {
                 var control = new SoundSystemControl();
-                control.IsPlaying = true;
+                control.TrackPlaying = true;
                 var ptr = Marshal.AllocHGlobal(Marshal.SizeOf(control));
 
                 Marshal.StructureToPtr(control, ptr, true);

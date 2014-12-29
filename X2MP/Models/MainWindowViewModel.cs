@@ -71,7 +71,7 @@ namespace X2MP.Models
             });
 
             Play = new Command((parameter) => {
-                App.SoundEngine.Play();
+                App.SoundEngine.PlayOrPause();
             });
         }
         #endregion
