@@ -23,7 +23,7 @@
             <!--grid for menu items-->
             <Grid Grid.Row="0">
                 <StackPanel Orientation="Horizontal">
-                    
+
                     <Button>
                         Collection
                     </Button>
@@ -31,30 +31,30 @@
                     <Button Command="{Binding OpenNowPlaying}">
                         Now Playing
                     </Button>
-                    
+
                 </StackPanel>
             </Grid>
-            
+
             <!--grid for everything else-->
             <Grid Grid.Row="1" >
-               
+
                 <ContentControl Content="{Binding Component}"
                                 Margin="10"/>
-               
+
             </Grid>
 
             <!--controls-->
             <Grid Grid.Row="2" HorizontalAlignment="Center">
                 <StackPanel Orientation="Horizontal">
                     <Button Style="{StaticResource ControlButton}" >
-                        A
+                        <Image Source="/Resources/prev.png"/>
                     </Button>
                     <Button Style="{StaticResource ControlButtonLarge}"
-                            Command="{Binding Play}">
-                        B
+                            Command="{Binding Play}" >
+                        <Image Source="/Resources/play.png"/>
                     </Button>
                     <Button Style="{StaticResource ControlButton}" >
-                        C
+                        <Image Source="/Resources/next.png"/>
                     </Button>
                 </StackPanel>
 
