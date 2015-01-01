@@ -27,5 +27,11 @@ namespace X2MP
             //initialize our view model
             this.DataContext = new MainWindowViewModel(this);
         }
+
+        private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            //move window
+            DragMove();
+        }
     }
 }

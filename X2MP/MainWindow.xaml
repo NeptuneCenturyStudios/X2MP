@@ -7,7 +7,9 @@
         ResizeMode="CanResizeWithGrip"
         MinWidth="325"
         MinHeight="200"
-        Style="{StaticResource WindowStyle}">
+        Style="{StaticResource WindowStyle}"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown"
+        >
 
     <!--main border around window-->
     <Border BorderThickness="1" BorderBrush="CornflowerBlue">
@@ -44,19 +46,29 @@
             </Grid>
 
             <!--controls-->
-            <Grid Grid.Row="2" HorizontalAlignment="Center">
-                <StackPanel Orientation="Horizontal">
-                    <Button Style="{StaticResource ControlButton}" >
-                        <Image Source="/Resources/prev.png"/>
-                    </Button>
-                    <Button Style="{StaticResource ControlButtonLarge}"
+            <Grid Grid.Row="2" Margin="10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Slider HorizontalAlignment="Stretch" Grid.Row="0"></Slider>
+                    <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
+                        <Button Style="{StaticResource ControlButton}" >
+                            <Image Source="/Resources/prev.png"/>
+                        </Button>
+                        <Button Style="{StaticResource ControlButtonLarge}"
                             Command="{Binding Play}" >
-                        <Image Source="/Resources/play.png"/>
-                    </Button>
-                    <Button Style="{StaticResource ControlButton}" >
-                        <Image Source="/Resources/next.png"/>
-                    </Button>
-                </StackPanel>
+                            <Image Source="/Resources/play.png"/>
+                        </Button>
+                        <Button Style="{StaticResource ControlButton}" >
+                            <Image Source="/Resources/next.png"/>
+                        </Button>
+                    </StackPanel>
+                    
+                </Grid>
+                
 
             </Grid>
 

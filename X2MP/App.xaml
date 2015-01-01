@@ -18,6 +18,16 @@
                     <ControlTemplate TargetType="Button">
 
                         <Border BorderThickness="2" BorderBrush="LightGray" Width="32" Height="32" Margin="5" CornerRadius="32">
+                            <Border.Style>
+                                <Style>
+                                    <Setter Property="Border.Background" Value="Transparent"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="Border.IsMouseOver" Value="True">
+                                            <Setter Property="Border.Background" Value="LightGray" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
                             <Grid>
                                 <ContentPresenter HorizontalAlignment="Center"
                                               VerticalAlignment="Center"/>
@@ -36,6 +46,17 @@
                     <ControlTemplate TargetType="Button">
 
                         <Border BorderThickness="2" BorderBrush="LightGray" Width="48" Height="48" Margin="5" CornerRadius="48">
+                            <Border.Style>
+                                <Style>
+                                    <Setter Property="Border.Background" Value="Transparent"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="Border.IsMouseOver" Value="True">
+                                            <Setter Property="Border.Background" Value="LightGray" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+
                             <Grid>
                                 <ContentPresenter HorizontalAlignment="Center"
                                               VerticalAlignment="Center"/>
@@ -46,12 +67,12 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        
+
         <!--text styles-->
         <Style TargetType="TextBlock" x:Key="MediumText">
             <Setter Property="FontFamily" Value="Segoe UI Light"/>
             <Setter Property="FontSize" Value="16px" />
         </Style>
-        
+
     </Application.Resources>
 </Application>
