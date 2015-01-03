@@ -33,5 +33,26 @@ namespace X2MP
             //move window
             DragMove();
         }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            //stop playback
+            var stopTask = App.SoundEngine.StopAsync();
+
+            //hide the window
+            this.Hide();
+
+            stopTask.ContinueWith((t) =>
+            {
+                //shutdown fmod
+                App.SoundEngine.Dispose();
+
+                //shutdown app
+                //App.Current.Shutdown();
+                Dispatcher.Invoke(() => { this.Close(); });
+                
+            });
+            
+        }
     }
 }

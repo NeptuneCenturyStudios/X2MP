@@ -25,7 +25,11 @@
             <!--grid for menu items-->
             <Grid Grid.Row="0">
                 <StackPanel Orientation="Horizontal">
-
+                    <Button x:Name="CloseButton" Style="{StaticResource ImageButton}"
+                            HorizontalAlignment="Right"
+                            Click="CloseButton_Click">
+                        <Image Source="/Resources/power.png"/>
+                    </Button>
                     <Button>
                         Collection
                     </Button>
@@ -53,7 +57,9 @@
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
 
-                    <Slider HorizontalAlignment="Stretch" Grid.Row="0"></Slider>
+                    <Slider HorizontalAlignment="Stretch" Grid.Row="0" 
+                            Maximum="{Binding Length}" Value="{Binding Position}" />
+
                     <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
                         <Button Style="{StaticResource ControlButton}" >
                             <Image Source="/Resources/prev.png"/>
@@ -66,9 +72,9 @@
                             <Image Source="/Resources/next.png"/>
                         </Button>
                     </StackPanel>
-                    
+
                 </Grid>
-                
+
 
             </Grid>
 

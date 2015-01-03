@@ -27,15 +27,14 @@ namespace X2MP
         {
             //initialize instance of FMOD engine
             SoundEngine = new SoundEngine();
-            
+
         }
 
-        protected override void OnExit(ExitEventArgs e)
-        {
-            //shutdown fmod
-            SoundEngine.Dispose();
+        //protected override void OnExit(ExitEventArgs e)
+        //{
 
-            base.OnExit(e);
-        }
+        //    base.OnExit(e);
+
+        //}
     }
 }

@@ -32,6 +32,20 @@ namespace X2MP.Models
             }
         }
 
+        /// <summary>
+        /// Fires the PropertyChanged event
+        /// </summary>
+        /// <param name="expression"></param>
+        protected void OnPropertyChanged(string propertyName)
+        {
+            //fire property changed event
+            var handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
         #endregion
     }
 }

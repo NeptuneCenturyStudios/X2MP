@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,6 +34,36 @@ namespace X2MP.Models
             }
         }
 
+        /// <summary>
+        /// Gets the length of the media in milliseconds
+        /// </summary>
+        private uint _length;
+        public uint Length
+        {
+            get { return _length; }
+            private set
+            {
+                _length = value;
+
+                OnPropertyChanged("Length");
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the position of the media in milliseconds
+        /// </summary>
+        private uint _position;
+        public uint Position
+        {
+            get { return _position; }
+            private set
+            {
+                _position = value;
+
+                OnPropertyChanged("Position");
+            }
+        }
+
         #endregion
 
         #region Commands
@@ -42,7 +73,11 @@ namespace X2MP.Models
         /// </summary>
         public ICommand OpenNowPlaying { get; private set; }
 
+        /// <summary>
+        /// Begins playback or pauses
+        /// </summary>
         public ICommand Play { get; private set; }
+
 
         #endregion
 
@@ -53,6 +88,19 @@ namespace X2MP.Models
             Window = window;
 
             Component = null;
+
+            //hook up properties
+            App.SoundEngine.PropertyChanged += (object sender, PropertyChangedEventArgs e) =>
+            {
+                //when the property changes, get its new value
+                var srcProp = App.SoundEngine.GetType().GetProperty(e.PropertyName);
+
+                var value = srcProp.GetValue(App.SoundEngine);
+
+                var dstProp = this.GetType().GetProperty(e.PropertyName);
+
+                dstProp.SetValue(this, value);
+            };
 
             //create commands
             RegisterCommands();
@@ -70,9 +118,12 @@ namespace X2MP.Models
                 Component = new NowPlayingUserControl();
             });
 
-            Play = new Command((parameter) => {
+            Play = new Command((parameter) =>
+            {
                 App.SoundEngine.PlayOrPause();
             });
+
+
         }
         #endregion
 
