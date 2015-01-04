@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using X2MP.Core;
 
 namespace X2MP.Models
 {
@@ -13,7 +14,19 @@ namespace X2MP.Models
     {
         #region Properties
 
+        /// <summary>
+        /// Reference to main window for this view model
+        /// </summary>
         public MainWindow Window { get; private set; }
+
+        ///// <summary>
+        ///// Gets the reference to the sound engine
+        ///// </summary>
+        //public SoundEngine SoundEngine
+        //{
+        //    get { return App.SoundEngine; }
+
+        //}
 
         /// <summary>
         /// Gets the current visible component e.g. Now Playing
@@ -37,33 +50,20 @@ namespace X2MP.Models
         /// <summary>
         /// Gets the length of the media in milliseconds
         /// </summary>
-        private uint _length;
         public uint Length
         {
-            get { return _length; }
-            private set
-            {
-                _length = value;
-
-                OnPropertyChanged("Length");
-            }
+            get { return App.SoundEngine.Length; }
         }
 
         /// <summary>
         /// Gets or sets the position of the media in milliseconds
         /// </summary>
-        private uint _position;
         public uint Position
         {
-            get { return _position; }
-            private set
-            {
-                _position = value;
-
-                OnPropertyChanged("Position");
-            }
+            get { return App.SoundEngine.Position; }
+            set { App.SoundEngine.Position = value; }
         }
-
+                
         #endregion
 
         #region Commands
@@ -92,14 +92,8 @@ namespace X2MP.Models
             //hook up properties
             App.SoundEngine.PropertyChanged += (object sender, PropertyChangedEventArgs e) =>
             {
-                //when the property changes, get its new value
-                var srcProp = App.SoundEngine.GetType().GetProperty(e.PropertyName);
-
-                var value = srcProp.GetValue(App.SoundEngine);
-
-                var dstProp = this.GetType().GetProperty(e.PropertyName);
-
-                dstProp.SetValue(this, value);
+                //raise the event that the property has changed
+                OnPropertyChanged(e.PropertyName);
             };
 
             //create commands

@@ -50,9 +50,47 @@ namespace X2MP
                 //shutdown app
                 //App.Current.Shutdown();
                 Dispatcher.Invoke(() => { this.Close(); });
-                
+
             });
-            
+
         }
+
+        private void Slider_DragStarted(object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e)
+        {
+            //get the slider and value
+            var slider = sender as Slider;
+            var value = slider.Value;
+
+            //clear the binding so that we do not update the slider while we are dragging it
+            BindingOperations.ClearBinding(sender as Slider, Slider.ValueProperty);
+
+            //reset slider value because removing the binding causes the value to become 0
+            slider.Value = value;
+        }
+
+        private void Slider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            //get the slider and value
+            var slider = sender as Slider;
+            var value = slider.Value;
+
+            //recreate the binding
+            var binding = new Binding()
+            {
+                Path = new PropertyPath("Position"),
+                Mode = BindingMode.TwoWay,
+                NotifyOnTargetUpdated = true,
+                NotifyOnSourceUpdated = true
+            };
+
+            //set the binding
+            BindingOperations.SetBinding(slider, Slider.ValueProperty, binding);
+
+            //s
+            slider.SetValue(Slider.ValueProperty, value);
+        }
+
+        
+
     }
 }

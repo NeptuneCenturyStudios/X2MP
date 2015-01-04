@@ -57,8 +57,10 @@
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
 
-                    <Slider HorizontalAlignment="Stretch" Grid.Row="0" 
-                            Maximum="{Binding Length}" Value="{Binding Position}" />
+                    <Slider HorizontalAlignment="Stretch" Grid.Row="0" LargeChange="5000" SmallChange="1000"
+                            Thumb.DragStarted="Slider_DragStarted"
+                            Thumb.DragCompleted="Slider_DragCompleted"
+                            Maximum="{Binding Length}" Value="{Binding Position, Mode=TwoWay, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True}" />
 
                     <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
                         <Button Style="{StaticResource ControlButton}" >

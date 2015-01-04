@@ -26,6 +26,7 @@ namespace X2MP.Core
             Neutral,
             Pause,
             Stop,
+            Seek,
             Next,
             Prev
         }
@@ -119,14 +120,30 @@ namespace X2MP.Core
         private uint _position;
         public uint Position
         {
-            get { return _position; }
-            private set
+            get { return InternalPosition; }
+            set
+            {
+                InternalPosition = value;
+
+                //set playback control to update position
+                PlayControl = PlaybackControl.Seek;
+            }
+        }
+
+        private uint InternalPosition
+        {
+            get
+            {
+                return _position;
+            }
+            set
             {
                 _position = value;
 
                 OnPropertyChanged("Position");
             }
         }
+
         #endregion
 
         #region Constructor / Destructor
@@ -180,9 +197,6 @@ namespace X2MP.Core
                 //release system
                 result = _system.release();
                 CheckError(result);
-
-                //free handles
-                //_controlHandle.Free();
 
             }
         }
@@ -266,8 +280,11 @@ namespace X2MP.Core
                     //a variable controls when the thread should be released.
                     await Task.Run(() =>
                     {
+                        FMOD.RESULT result;
                         bool stopping = false;
                         IsPlaying = true;
+
+                        //set control to neutral
                         PlayControl = PlaybackControl.Neutral;
 
                         //get the length of the media
@@ -277,9 +294,6 @@ namespace X2MP.Core
                         //update the open state, and update the system so that callbacks will be generated
                         while (IsPlaying)
                         {
-
-                            //we must call this once per frame
-                            _system.update();
 
                             //if cancellation of the playback token is requested, initiate stop
                             if (_playbackCts.IsCancellationRequested && !stopping)
@@ -295,32 +309,40 @@ namespace X2MP.Core
                             {
                                 //pause or unpause the playback
                                 Pause(channel);
-
-                                //return to resting
-                                PlayControl = PlaybackControl.Neutral;
                             }
-
+                            else if (PlayControl == PlaybackControl.Seek)
+                            {
+                                //seek to new position
+                                SetPostion(channel, InternalPosition);
+                            }
 
                             //update the open state of the media
                             media.UpdateOpenState();
 
-                            //get the position
-                            Position = GetPosition(channel);
+                            //is media still playing?
+                            IsPlaying = GetIsPlaying(channel);
 
-                            //is media still playing
-                            //IsPlaying = (media.OpenState == FMOD.OPENSTATE.PLAYING);
-                            bool isPlaying;
-                            channel.isPlaying(out isPlaying);
+                            //get the position and set it to the internal position property
+                            if (IsPlaying && PlayControl != PlaybackControl.Seek)
+                            {
+                                InternalPosition = GetPosition(channel);
+                            }
 
-                            IsPlaying = isPlaying;
+                            //we must call this once per frame
+                            result = _system.update();
+                            CheckError(result);
+
+                            //return to resting after executing a play control command
+                            PlayControl = PlaybackControl.Neutral;
 
                             //wait
-                            Thread.Sleep(10);
+                            Thread.Sleep(5);
                         }
 
                     }, _playbackCts.Token);
 
-
+                    //ensure everything knows that playback has stopped
+                    IsPlaying = false;
                 }
 
             });
@@ -339,7 +361,7 @@ namespace X2MP.Core
                 //wait until IsPlaying is false
                 while (IsPlaying)
                 {
-                    Thread.Sleep(10);
+                    Thread.Sleep(5);
                 }
 
             });
@@ -457,15 +479,36 @@ namespace X2MP.Core
         #region Media Query
 
         /// <summary>
+        /// Gets whether the channel is currently playing
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <returns></returns>
+        private bool GetIsPlaying(FMOD.Channel channel)
+        {
+            FMOD.RESULT result;
+            bool isPlaying;
+
+            //get is playing
+            result = channel.isPlaying(out isPlaying);
+            //CheckError(result);
+
+            return isPlaying;
+        }
+
+        /// <summary>
         /// Gets the length of the media in milliseconds
         /// </summary>
         /// <param name="media"></param>
         /// <returns></returns>
         private uint GetLength(MediaInfo media)
         {
-            //get length
+
+            FMOD.RESULT result;
             uint length;
-            media.Sound.getLength(out length, FMOD.TIMEUNIT.MS);
+
+            //get length
+            result = media.Sound.getLength(out length, FMOD.TIMEUNIT.MS);
+            CheckError(result);
 
             return length;
         }
@@ -477,11 +520,30 @@ namespace X2MP.Core
         /// <returns></returns>
         private uint GetPosition(FMOD.Channel channel)
         {
+            FMOD.RESULT result;
             uint position;
-            channel.getPosition(out position, FMOD.TIMEUNIT.MS);
+
+            //get position
+            result = channel.getPosition(out position, FMOD.TIMEUNIT.MS);
+            CheckError(result);
 
             return position;
         }
+
+        /// <summary>
+        /// Sets the position of the playing stream
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <param name="position"></param>
+        private void SetPostion(FMOD.Channel channel, uint position)
+        {
+            FMOD.RESULT result;
+
+            //set position
+            result = channel.setPosition(position, FMOD.TIMEUNIT.MS);
+            CheckError(result);
+        }
+
         #endregion
 
 
