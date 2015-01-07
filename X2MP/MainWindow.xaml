@@ -22,6 +22,9 @@
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
 
+            <!--visualization image-->
+            <Image x:Name="VisualizationImage"/>
+            
             <!--grid for menu items-->
             <Grid Grid.Row="0">
                 <StackPanel Orientation="Horizontal">

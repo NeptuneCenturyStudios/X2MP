@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,14 +20,21 @@ namespace X2MP.Models
         /// </summary>
         public MainWindow Window { get; private set; }
 
-        ///// <summary>
-        ///// Gets the reference to the sound engine
-        ///// </summary>
-        //public SoundEngine SoundEngine
-        //{
-        //    get { return App.SoundEngine; }
+        private Image _backbuffer;
+        private Image _visualization;
+        public Image Visualization
+        {
+            get
+            {
+                return _visualization;
+            }
+            private set
+            {
+                _visualization = value;
 
-        //}
+                OnPropertyChanged("Visualization");
+            }
+        }
 
         /// <summary>
         /// Gets the current visible component e.g. Now Playing
@@ -63,7 +71,7 @@ namespace X2MP.Models
             get { return App.SoundEngine.Position; }
             set { App.SoundEngine.Position = value; }
         }
-                
+
         #endregion
 
         #region Commands
@@ -88,6 +96,10 @@ namespace X2MP.Models
             Window = window;
 
             Component = null;
+
+            //create the back buffer to render visuals
+            CreateBackbuffer();
+            RenderVisualization();
 
             //hook up properties
             App.SoundEngine.PropertyChanged += (object sender, PropertyChangedEventArgs e) =>
@@ -121,5 +133,45 @@ namespace X2MP.Models
         }
         #endregion
 
+        #region Visualization Methods
+
+        /// <summary>
+        /// Creates a backbuffer to draw on
+        /// </summary>
+        private void CreateBackbuffer()
+        {
+            //if we have to create it again, destroy it
+            if (_backbuffer != null)
+            {
+                _backbuffer.Dispose();
+            }
+
+            //create back buffer
+            _backbuffer = new Bitmap((int)Window.Width, (int)Window.Height);
+        }
+
+        /// <summary>
+        /// Renders the visualization to the backbuffer
+        /// </summary>
+        private void RenderVisualization()
+        {
+            using (var g = Graphics.FromImage(_backbuffer))
+            {
+                //clear the drawing surface
+                g.Clear(Color.Transparent);
+
+                //draw stuff - test
+                g.FillRectangle(Brushes.CornflowerBlue, new Rectangle(10, 10, 100, 100));
+
+                //copy the image to the image we want to present
+                using (var pg = Graphics.FromImage(Visualization))
+                {
+                    //render the back buffer to our visualization
+                    pg.DrawImage(_backbuffer, new PointF(0, 0));
+                }
+            }
+        }
+
+        #endregion
     }
 }

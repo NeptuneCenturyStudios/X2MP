@@ -86,7 +86,7 @@ namespace X2MP
             //set the binding
             BindingOperations.SetBinding(slider, Slider.ValueProperty, binding);
 
-            //s
+            //set slider value
             slider.SetValue(Slider.ValueProperty, value);
         }
 
