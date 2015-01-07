@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -21,11 +23,48 @@ namespace X2MP
     /// </summary>
     public partial class MainWindow : Window
     {
+        [DllImport("gdi32")]
+        static extern int DeleteObject(IntPtr o);
+
+        public static BitmapSource LoadBitmap(System.Drawing.Bitmap source)
+        {
+            IntPtr ip = source.GetHbitmap();
+            BitmapSource bs = null;
+            try
+            {
+                bs = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(ip,
+                   IntPtr.Zero, Int32Rect.Empty,
+                   System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
+            }
+            finally
+            {
+                DeleteObject(ip);
+            }
+
+            return bs;
+        }
+
         public MainWindow()
         {
             InitializeComponent();
             //initialize our view model
-            this.DataContext = new MainWindowViewModel(this);
+            var model = new MainWindowViewModel(this);
+            this.DataContext = model;
+
+            model.VisualizationUpdated += model_VisualizationUpdated;
+        }
+
+        void model_VisualizationUpdated(object sender, EventArgs e)
+        {
+            Dispatcher.Invoke(() => {
+                //if (this.Background != null)
+                //{
+                //    var img = this.Background as ImageBrush;
+                    
+                //}
+                this.Background = new ImageBrush(LoadBitmap((Bitmap)(sender as MainWindowViewModel).Visualization));
+            });
+            
         }
 
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

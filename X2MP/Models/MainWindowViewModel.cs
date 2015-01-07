@@ -4,15 +4,23 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using X2MP.Core;
 
 namespace X2MP.Models
 {
     class MainWindowViewModel : BaseViewModel
     {
+        #region Events
+
+        public event EventHandler VisualizationUpdated;
+
+        #endregion
+
         #region Properties
 
         /// <summary>
@@ -31,8 +39,6 @@ namespace X2MP.Models
             private set
             {
                 _visualization = value;
-
-                OnPropertyChanged("Visualization");
             }
         }
 
@@ -99,7 +105,7 @@ namespace X2MP.Models
 
             //create the back buffer to render visuals
             CreateBackbuffer();
-            RenderVisualization();
+
 
             //hook up properties
             App.SoundEngine.PropertyChanged += (object sender, PropertyChangedEventArgs e) =>
@@ -110,6 +116,16 @@ namespace X2MP.Models
 
             //create commands
             RegisterCommands();
+
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    RenderVisualization();
+
+                    Thread.Sleep(25);
+                }
+            });
         }
 
         #endregion
@@ -144,10 +160,13 @@ namespace X2MP.Models
             if (_backbuffer != null)
             {
                 _backbuffer.Dispose();
+                Visualization.Dispose();
             }
 
             //create back buffer
             _backbuffer = new Bitmap((int)Window.Width, (int)Window.Height);
+
+            Visualization = new Bitmap((int)Window.Width, (int)Window.Height);
         }
 
         /// <summary>
@@ -158,7 +177,7 @@ namespace X2MP.Models
             using (var g = Graphics.FromImage(_backbuffer))
             {
                 //clear the drawing surface
-                g.Clear(Color.Transparent);
+                g.Clear(Color.White);
 
                 //draw stuff - test
                 g.FillRectangle(Brushes.CornflowerBlue, new Rectangle(10, 10, 100, 100));
@@ -170,8 +189,22 @@ namespace X2MP.Models
                     pg.DrawImage(_backbuffer, new PointF(0, 0));
                 }
             }
+
+            OnVisualizationUpdated();
+            
         }
 
+        #endregion
+
+        #region Event Handlers
+        protected void OnVisualizationUpdated()
+        {
+            var handler = VisualizationUpdated;
+            if (handler != null)
+            {
+                VisualizationUpdated(this, EventArgs.Empty);
+            }
+        }
         #endregion
     }
 }

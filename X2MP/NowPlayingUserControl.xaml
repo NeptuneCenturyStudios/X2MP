@@ -17,7 +17,7 @@
         <TextBlock Grid.Row="0" Text="Drop files here or add them from your collection" 
                    Style="{StaticResource MediumText}" Foreground="Gray" HorizontalAlignment="Center" />
 
-        <ListView Grid.Row="1" ItemsSource="{ Binding NowPlaying }">
+        <ListView Grid.Row="1" ItemsSource="{ Binding NowPlaying }" Opacity="0.75">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Track" Width="50" DisplayMemberBinding="{Binding TagInfo.Track}" />
