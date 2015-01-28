@@ -25,6 +25,7 @@ namespace X2MP
         /// </summary>
         public App()
         {
+            
             //initialize instance of FMOD engine
             SoundEngine = new SoundEngine();
 

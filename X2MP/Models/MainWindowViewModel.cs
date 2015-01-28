@@ -117,6 +117,8 @@ namespace X2MP.Models
             //create commands
             RegisterCommands();
 
+
+
             Task.Run(() =>
             {
                 while (true)
@@ -142,7 +144,30 @@ namespace X2MP.Models
 
             Play = new Command((parameter) =>
             {
+                var playList = new List<PlayListEntry>();
+                
+                foreach (var entry in App.SoundEngine.NowPlaying)
+                {
+                    playList.Add(entry);
+                }
+
+                App.SoundEngine.NeedNextMedia += (sender, e) =>
+                {
+                    if (playList.Count > 0)
+                    {
+                        //feed the sound engine
+                        var entry = playList[0];
+
+                        e.Media = entry;
+
+                        //remove entry from list
+                        playList.Remove(entry);
+                    }
+                };
+
                 App.SoundEngine.PlayOrPause();
+
+                
             });
 
 
@@ -191,7 +216,7 @@ namespace X2MP.Models
             }
 
             OnVisualizationUpdated();
-            
+
         }
 
         #endregion
