@@ -213,6 +213,15 @@ namespace X2MP.Core
 
         #endregion
 
+        #region Callbacks
+        FMOD.RESULT myDSPCallback(ref FMOD.DSP_STATE dsp_state, IntPtr inbuffer, IntPtr outbuffer, uint length, int inchannels, ref int outchannels)
+        {
+
+
+            return FMOD.RESULT.OK;
+        }
+        #endregion
+
         #region Playback Methods
 
         public void Update()
@@ -229,7 +238,7 @@ namespace X2MP.Core
             if (IsPlaying)
             {
                 //its playing: pause or unpause
-                PlayControl = PlaybackControl.Pause;
+                Pause();
             }
             else
             {
@@ -270,29 +279,6 @@ namespace X2MP.Core
         }
 
         /// <summary>
-        /// Pauses or unpauses playback
-        /// </summary>
-        private void Pause(FMOD.Channel channel)
-        {
-            FMOD.RESULT result;
-            bool paused;
-            result = channel.getPaused(out paused);
-            CheckError(result);
-
-            result = channel.setPaused(!paused);
-            CheckError(result);
-
-        }
-
-
-        FMOD.RESULT myDSPCallback(ref FMOD.DSP_STATE dsp_state, IntPtr inbuffer, IntPtr outbuffer, uint length, int inchannels, ref int outchannels)
-        {
-
-
-            return FMOD.RESULT.OK;
-        }
-
-        /// <summary>
         /// Begins playback. This method is called when the user initiates playback.
         /// </summary>
         private void Play()
@@ -311,12 +297,20 @@ namespace X2MP.Core
             }
 
 
-            //send the media to be played
-            LoadMedia(args.Media);
 
-            //play the stream
-            PlayStream();
 
+            var playTask = Task.Run(() =>
+            {
+                //send the media to be played
+                LoadMedia(args.Media);
+                //play the stream
+                PlayStream();
+            });
+
+            playTask.ContinueWith((t) =>
+            {
+                var h = 9;
+            });
 
             //update the system
             //Task.Run(() =>
@@ -436,61 +430,6 @@ namespace X2MP.Core
         }
 
         /// <summary>
-        /// Stops playback
-        /// </summary>
-        public async Task StopAsync()
-        {
-            //stops playback of the media
-            _playbackCts.Cancel();
-
-            await Task.Run(() =>
-            {
-                //wait until IsPlaying is false
-                while (IsPlaying)
-                {
-                    Thread.Sleep(5);
-                }
-
-            });
-        }
-
-        /// <summary>
-        /// Creates a stream non-blocking
-        /// </summary>
-        /// <param name="filename"></param>
-        /// <returns></returns>
-        private async Task CreateStreamAsync(MediaInfo media)
-        {
-
-            //result
-            FMOD.RESULT result;
-            //FMOD.CREATESOUNDEXINFO exInfo = new FMOD.CREATESOUNDEXINFO();
-
-            //create a stream non-blocking
-            result = this._system.createSound(media.FileName, FMOD.MODE.DEFAULT, out media.Sound);
-            CheckError(result);
-
-            //we have to check status to determine when the sound is ready to be played
-            await Task.Run(() =>
-            {
-                //update the open state of the media
-                media.UpdateOpenState();
-                //check the open state of the media
-                while (media.OpenState != FMOD.OPENSTATE.READY && media.OpenState != FMOD.OPENSTATE.ERROR)
-                {
-                    //update the open state of the media
-                    media.UpdateOpenState();
-
-                    //wait
-                    Thread.Sleep(1);
-                }
-
-
-            });
-
-        }
-
-        /// <summary>
         /// Takes a media info object and plays it on an open channel
         /// </summary>
         /// <param name="media"></param>
@@ -534,9 +473,48 @@ namespace X2MP.Core
             //result = _channel.setPaused(false);
             //CheckError(result);
 
+            //hold the thread hostage
+            while (GetIsPlaying())
+            {
+                Update();
+                Thread.Sleep(25);
+            }
 
 
+        }
 
+        /// <summary>
+        /// Pauses or unpauses playback
+        /// </summary>
+        private void Pause()
+        {
+            FMOD.RESULT result;
+            bool paused;
+            result = _channel.getPaused(out paused);
+            CheckError(result);
+
+            result = _channel.setPaused(!paused);
+            CheckError(result);
+
+        }
+
+        /// <summary>
+        /// Stops playback
+        /// </summary>
+        public async Task StopAsync()
+        {
+            //stops playback of the media
+            _playbackCts.Cancel();
+
+            await Task.Run(() =>
+            {
+                //wait until IsPlaying is false
+                while (IsPlaying)
+                {
+                    Thread.Sleep(5);
+                }
+
+            });
         }
 
         /// <summary>
@@ -600,13 +578,13 @@ namespace X2MP.Core
         /// </summary>
         /// <param name="channel"></param>
         /// <returns></returns>
-        private bool GetIsPlaying(FMOD.Channel channel)
+        private bool GetIsPlaying()
         {
             FMOD.RESULT result;
             bool isPlaying;
 
             //get is playing
-            result = channel.isPlaying(out isPlaying);
+            result = _channel.isPlaying(out isPlaying);
             //CheckError(result);
 
             return isPlaying;
@@ -663,7 +641,6 @@ namespace X2MP.Core
 
         #endregion
 
-
         #region Helper Methods
 
         /// <summary>
@@ -681,41 +658,6 @@ namespace X2MP.Core
             }
         }
         #endregion
-
-        //#region Callback
-
-        ///// <summary>
-        ///// Handles channel callbacks
-        ///// </summary>
-        ///// <param name="channelraw"></param>
-        ///// <param name="controltype"></param>
-        ///// <param name="type"></param>
-        ///// <param name="commanddata1"></param>
-        ///// <param name="commanddata2"></param>
-        ///// <returns></returns>
-        //private static FMOD.RESULT ChannelCallback(IntPtr channelraw, FMOD.CHANNELCONTROL_TYPE controltype, FMOD.CHANNELCONTROL_CALLBACK_TYPE type, IntPtr commanddata1, IntPtr commanddata2)
-        //{
-
-        //    //create a channel object from a pointer
-        //    FMOD.Channel channel = new FMOD.Channel(channelraw);
-
-        //    //detect type of callback
-        //    if (type == FMOD.CHANNELCONTROL_CALLBACK_TYPE.END)
-        //    {
-        //        //get user data
-        //        IntPtr data;
-        //        FMOD.RESULT result = channel.getUserData(out data);
-
-        //        //get the playback control
-        //        var control = (SoundSystemControl)GCHandle.FromIntPtr(data).Target;
-
-        //        //the track is no longer playing. release the hostage!
-        //        control.TrackPlaying = false;
-        //    }
-
-        //    return FMOD.RESULT.OK;
-        //}
-        //#endregion
 
         #region Event Handlers
 
