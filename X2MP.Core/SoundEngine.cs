@@ -235,7 +235,7 @@ namespace X2MP.Core
         public void PlayOrPause()
         {
             //if the track is playing, then pressing play again will pause the track
-            if (IsPlaying)
+            if (GetIsPlaying())
             {
                 //its playing: pause or unpause
                 Pause();
@@ -580,6 +580,8 @@ namespace X2MP.Core
         /// <returns></returns>
         private bool GetIsPlaying()
         {
+            if (this._channel == null) return false;
+
             FMOD.RESULT result;
             bool isPlaying;
 
