@@ -131,8 +131,8 @@ namespace X2MP.Core
             {
                 InternalPosition = value;
 
-                //set playback control to update position
-                PlayControl = PlaybackControl.Seek;
+                //set position on the channel
+                SetPostion(value);
             }
         }
 
@@ -177,14 +177,13 @@ namespace X2MP.Core
             result = _system.init(32, FMOD.INITFLAGS.NORMAL, IntPtr.Zero);
             CheckError(result);
             dspDesc = new FMOD.DSP_DESCRIPTION();
-            ////create our dsp description
-            //FMOD.DSP_DESCRIPTION dspDesc = new FMOD.DSP_DESCRIPTION();
 
-            //dspDesc.name = new char[32];//"waveform dsp unit".ToCharArray();
-            //dspDesc.version = 0x00010000;
-            //dspDesc.numinputbuffers = 1;
-            //dspDesc.numoutputbuffers = 1;
-            //dspDesc.read = myDSPCallback;
+            //create our dsp description
+            dspDesc.name = new char[32];
+            dspDesc.version = 0x00010000;
+            dspDesc.numinputbuffers = 1;
+            dspDesc.numoutputbuffers = 1;
+            dspDesc.read = myDSPCallback;
 
             ////create the dsp, although it will not be active at this time
             //result = _system.createDSP(ref dspDesc, out _dsp);
@@ -216,15 +215,37 @@ namespace X2MP.Core
         #region Callbacks
         FMOD.RESULT myDSPCallback(ref FMOD.DSP_STATE dsp_state, IntPtr inbuffer, IntPtr outbuffer, uint length, int inchannels, ref int outchannels)
         {
+            unsafe
+            {
 
+                float* outBuff = (float*)outbuffer.ToPointer();
+                float* inBuff = (float*)inbuffer.ToPointer();
 
+                for (uint samp = 0; samp < length; samp++)
+                {
+                    /*
+                        Feel free to unroll this.
+                    */
+                    for (int chan = 0; chan < outchannels; chan++)
+                    {
+                        /* 
+                            This DSP filter just halves the volume! 
+                            Input is modified, and sent to output.
+                        */
+                        outBuff[(samp * outchannels) + chan] = inBuff[(samp * inchannels) + chan];// *0.2f;
+                    }
+                }
+            }
             return FMOD.RESULT.OK;
         }
         #endregion
 
         #region Playback Methods
 
-        public void Update()
+        /// <summary>
+        /// Updates the FMOD sound system
+        /// </summary>
+        private void Update()
         {
             _system.update();
         }
@@ -276,6 +297,8 @@ namespace X2MP.Core
                 _sound.getOpenState(out openState, out percentBuffered, out starving, out diskBusy);
                 Thread.Sleep(25);
             }
+
+            Length = GetLength();
         }
 
         /// <summary>
@@ -309,7 +332,8 @@ namespace X2MP.Core
 
             playTask.ContinueWith((t) =>
             {
-                var h = 9;
+                //play the next song
+                Play();
             });
 
             //update the system
@@ -454,30 +478,37 @@ namespace X2MP.Core
             //}
 
             //play the sound on the channel
-            result = _system.playSound(_sound, null, false, out _channel);
+            result = _system.playSound(_sound, null, true, out _channel);
             CheckError(result);
-
-            //create our dsp description
-
-
-            dspDesc.name = new char[32];//"waveform dsp unit".ToCharArray();
-            dspDesc.version = 0x00010000;
-            dspDesc.numinputbuffers = 1;
-            dspDesc.numoutputbuffers = 1;
-            dspDesc.read = myDSPCallback;
-
+                        
             //create the dsp, although it will not be active at this time
             result = _system.createDSP(ref dspDesc, out _dsp);
+
+            ////deactivate
+            //_dsp.setBypass(true);
+
+            //add to dsp chain
             _channel.addDSP(0, _dsp);
+
             //unpause when ready to begin playing
-            //result = _channel.setPaused(false);
-            //CheckError(result);
+            result = _channel.setPaused(false);
+            CheckError(result);
+
+            ////activate
+            //_dsp.setBypass(false);
+            
+            
 
             //hold the thread hostage
             while (GetIsPlaying())
             {
                 Update();
+
+                InternalPosition = GetPosition();
+
+
                 Thread.Sleep(25);
+
             }
 
 
@@ -597,14 +628,14 @@ namespace X2MP.Core
         /// </summary>
         /// <param name="media"></param>
         /// <returns></returns>
-        private uint GetLength(MediaInfo media)
+        private uint GetLength()
         {
 
             FMOD.RESULT result;
             uint length;
 
             //get length
-            result = media.Sound.getLength(out length, FMOD.TIMEUNIT.MS);
+            result = _sound.getLength(out length, FMOD.TIMEUNIT.MS);
             CheckError(result);
 
             return length;
@@ -615,13 +646,13 @@ namespace X2MP.Core
         /// </summary>
         /// <param name="channel"></param>
         /// <returns></returns>
-        private uint GetPosition(FMOD.Channel channel)
+        private uint GetPosition()
         {
             FMOD.RESULT result;
             uint position;
 
             //get position
-            result = channel.getPosition(out position, FMOD.TIMEUNIT.MS);
+            result = _channel.getPosition(out position, FMOD.TIMEUNIT.MS);
             CheckError(result);
 
             return position;
@@ -632,12 +663,12 @@ namespace X2MP.Core
         /// </summary>
         /// <param name="channel"></param>
         /// <param name="position"></param>
-        private void SetPostion(FMOD.Channel channel, uint position)
+        private void SetPostion(uint position)
         {
             FMOD.RESULT result;
 
             //set position
-            result = channel.setPosition(position, FMOD.TIMEUNIT.MS);
+            result = _channel.setPosition(position, FMOD.TIMEUNIT.MS);
             CheckError(result);
         }
 
