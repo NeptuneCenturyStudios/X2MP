@@ -22,45 +22,19 @@ namespace X2MP.Core
 
         #region Fields
 
-        public enum PlaybackControl
-        {
-            Neutral,
-            Pause,
-            Stop,
-            Seek,
-            Next,
-            Prev
-        }
+        //FMOD system objects
+        private FMOD.System _system;                //main system handle
+        private FMOD.Sound _sound;                  //sound handle
+        private FMOD.Channel _channel;              //channel handle
 
-        /// <summary>
-        /// FMOD system object
-        /// </summary>
-        private FMOD.System _system;
-        private FMOD.Sound _sound;
-        private FMOD.Channel _channel;
-        private FMOD.DSP _dsp;
-        FMOD.DSP_DESCRIPTION dspDesc;
-
-        ///// <summary>
-        ///// Stores information to control playback. This structure will be passed to callbacks
-        ///// </summary>
-        //private SoundSystemControl _control;
-
-        ///// <summary>
-        ///// Handle to the SoundSystemControl object
-        ///// </summary>
-        //private GCHandle _controlHandle;
+        private FMOD.DSP _dsp;                      //our DSP unit
+        private FMOD.DSP_DESCRIPTION _dspDesc;      //DSP description. this is global because the GC tends to destroy the delegate for the callback, leading to exceptions
+        private float[] _sampleBuffer;              //stores a copy of the current frame from the DSP unit
 
         /// <summary>
         /// Cancellation token source for cancelling playback
         /// </summary>
         private CancellationTokenSource _playbackCts;
-
-        /// <summary>
-        /// Playing channel
-        /// </summary>
-        //private FMOD.Channel _channel;
-        //private List<FMOD.Channel> Channels { get; set; }
 
         #endregion
 
@@ -69,41 +43,12 @@ namespace X2MP.Core
         /// <summary>
         /// Gets or sets the internal playlist from which FMOD gets its streams
         /// </summary>
-        private List<MediaInfo> InternalPlayList { get; set; }
+        private List<PlayListEntry> InternalPlayList { get; set; }
 
         /// <summary>
         /// Gets the currently playing playlist.
         /// </summary>
         public PlayList NowPlaying { get; private set; }
-
-
-        ///// <summary>
-        ///// Gets whether the channel is playing
-        ///// </summary>
-        //public bool IsPlaying
-        //{
-        //    get
-        //    {
-        //        if (_channel != null)
-        //        {
-
-        //            bool isPlaying;
-        //            FMOD.RESULT result;
-
-        //            result = _channel.isPlaying(out isPlaying);
-        //            CheckError(result);
-
-        //            //returns whether or not the channel is playing
-        //            return isPlaying;
-        //        }
-        //        else
-        //        {
-        //            return false;
-        //        }
-        //    }
-        //}
-        public bool IsPlaying { get; private set; }
-        private PlaybackControl PlayControl { get; set; }
 
         /// <summary>
         /// Gets the length of the media in milliseconds
@@ -136,12 +81,13 @@ namespace X2MP.Core
             }
         }
 
+        /// <summary>
+        /// We update this from within the playback loop thread.
+        /// This notifies listeners of changes for the "Position" property
+        /// </summary>
         private uint InternalPosition
         {
-            get
-            {
-                return _position;
-            }
+            get { return _position; }
             set
             {
                 _position = value;
@@ -162,11 +108,8 @@ namespace X2MP.Core
             //initialize the playlist
             NowPlaying = new PlayList();
             //initialize internal playlist
-            InternalPlayList = new List<MediaInfo>();
-            //playing channels
-            _playbackCts = new CancellationTokenSource();
-
-
+            InternalPlayList = new List<PlayListEntry>();
+            
             FMOD.RESULT result;
 
             //create the system object   
@@ -176,17 +119,17 @@ namespace X2MP.Core
             //initialize fmod
             result = _system.init(32, FMOD.INITFLAGS.NORMAL, IntPtr.Zero);
             CheckError(result);
-            dspDesc = new FMOD.DSP_DESCRIPTION();
 
-            //create our dsp description
-            dspDesc.name = new char[32];
-            dspDesc.version = 0x00010000;
-            dspDesc.numinputbuffers = 1;
-            dspDesc.numoutputbuffers = 1;
-            dspDesc.read = myDSPCallback;
+            //create a dsp description for a dsp unit.
+            //this dsp unit will allow us to tap into the buffer and get some waveform
+            //data for visualizations
+            _dspDesc = new FMOD.DSP_DESCRIPTION();
+            _dspDesc.name = new char[32];
+            _dspDesc.version = 0x00010000;
+            _dspDesc.numinputbuffers = 1;
+            _dspDesc.numoutputbuffers = 1;
+            _dspDesc.read = myDSPCallback;
 
-            ////create the dsp, although it will not be active at this time
-            //result = _system.createDSP(ref dspDesc, out _dsp);
         }
 
         /// <summary>
@@ -194,7 +137,7 @@ namespace X2MP.Core
         /// </summary>
         public void Dispose()
         {
-            //destroy FMOD ';;'
+            //destroy FMOD
             if (_system != null)
             {
                 FMOD.RESULT result;
@@ -213,32 +156,58 @@ namespace X2MP.Core
         #endregion
 
         #region Callbacks
+
+        /// <summary>
+        /// Callback for the DSP unit
+        /// </summary>
+        /// <param name="dsp_state"></param>
+        /// <param name="inbuffer"></param>
+        /// <param name="outbuffer"></param>
+        /// <param name="length"></param>
+        /// <param name="inchannels"></param>
+        /// <param name="outchannels"></param>
+        /// <returns></returns>
         FMOD.RESULT myDSPCallback(ref FMOD.DSP_STATE dsp_state, IntPtr inbuffer, IntPtr outbuffer, uint length, int inchannels, ref int outchannels)
         {
+
+            //getting unsafe here to handle raw pointers to the buffer
             unsafe
             {
-
+                //create raw pointers for the buffers
                 float* outBuff = (float*)outbuffer.ToPointer();
                 float* inBuff = (float*)inbuffer.ToPointer();
 
                 for (uint samp = 0; samp < length; samp++)
                 {
-                    /*
-                        Feel free to unroll this.
-                    */
+                    //assumes in channels is the same as out channels
                     for (int chan = 0; chan < outchannels; chan++)
                     {
-                        /* 
-                            This DSP filter just halves the volume! 
-                            Input is modified, and sent to output.
-                        */
-                        outBuff[(samp * outchannels) + chan] = inBuff[(samp * inchannels) + chan];// *0.2f;
+                        //all we are doing in this DSP is pumping the input to the output,
+                        //and copying the sample to a buffer we can read for visualizations
+                        outBuff[(samp * outchannels) + chan] = inBuff[(samp * inchannels) + chan];
                     }
                 }
+
+                //length of the buffer
+                var bufferLength = (length * outchannels);
+
+                //create a buffer if we don't have one, or if the length has changed.
+                if (_sampleBuffer == null || _sampleBuffer.Length != bufferLength)
+                {
+                    _sampleBuffer = new float[bufferLength];
+                }
+
+                //copy buffer
+                Marshal.Copy(outbuffer, _sampleBuffer, 0, _sampleBuffer.Length);
+
             }
+
+            //return ok
             return FMOD.RESULT.OK;
         }
         #endregion
+
+
 
         #region Playback Methods
 
@@ -318,139 +287,30 @@ namespace X2MP.Core
             {
                 return;
             }
+            
+            //create new cancellation token
+            _playbackCts = new CancellationTokenSource();
 
-
-
-
+            //create a play task
             var playTask = Task.Run(() =>
             {
                 //send the media to be played
                 LoadMedia(args.Media);
                 //play the stream
                 PlayStream();
-            });
+            }, _playbackCts.Token);
 
             playTask.ContinueWith((t) =>
             {
+                if (_playbackCts.IsCancellationRequested)
+                {
+                    return;
+                }
                 //play the next song
                 Play();
             });
 
-            //update the system
-            //Task.Run(() =>
-            //{
-
-            //    _system.update();
-
-            //});
-
-
-            ////create a new cancellation token
-            //_playbackCts = new CancellationTokenSource();
-
-
-            ////start a task to prepare the playlist
-            //await Task.Run(async () =>
-            //{
-            //    //clear the internal playlist
-            //    InternalPlayList.Clear();
-
-            //    //create the internal playlist
-            //    foreach (var item in NowPlaying)
-            //    {
-            //        //add the item from the now playing window to the internal playlist
-            //        InternalPlayList.Add(new MediaInfo() { FileName = item.FileName });
-            //    }
-
-            //    //look through the internal playlist
-            //    foreach (var media in InternalPlayList)
-            //    {
-            //        //check is playback is stopped
-            //        if (_playbackCts.IsCancellationRequested)
-            //        {
-            //            break;
-            //        }
-
-            //        //create the stream from the media info
-            //        await CreateStreamAsync(media);
-
-            //        //play it
-            //        var channel = PlayStream(media);
-
-
-
-            //        //channel.addDSP(0, dsp);
-
-            //        //now that the sound is playing, we hold the thread hostage.
-            //        //a variable controls when the thread should be released.
-            //        await Task.Run(() =>
-            //        {
-            //            FMOD.RESULT result;
-            //            bool stopping = false;
-            //            IsPlaying = true;
-
-            //            //set control to neutral
-            //            PlayControl = PlaybackControl.Neutral;
-
-            //            //get the length of the media
-            //            Length = GetLength(media);
-
-            //            //hold thread hostage while the sound is playing. in the meantime,
-            //            //update the open state, and update the system so that callbacks will be generated
-            //            while (IsPlaying)
-            //            {
-
-            //                //if cancellation of the playback token is requested, initiate stop
-            //                if (_playbackCts.IsCancellationRequested && !stopping)
-            //                {
-            //                    //begin stop
-            //                    var stopTask = StopStreamAsync(channel, media);
-            //                    //prevent from trying to stop again
-            //                    stopping = true;
-            //                }
-
-            //                //check play control and control playback accordingly
-            //                if (PlayControl == PlaybackControl.Pause && !stopping)
-            //                {
-            //                    //pause or unpause the playback
-            //                    Pause(channel);
-            //                }
-            //                else if (PlayControl == PlaybackControl.Seek)
-            //                {
-            //                    //seek to new position
-            //                    SetPostion(channel, InternalPosition);
-            //                }
-
-            //                //update the open state of the media
-            //                media.UpdateOpenState();
-
-            //                //is media still playing?
-            //                IsPlaying = GetIsPlaying(channel);
-
-            //                //get the position and set it to the internal position property
-            //                if (IsPlaying && PlayControl != PlaybackControl.Seek)
-            //                {
-            //                    InternalPosition = GetPosition(channel);
-            //                }
-
-            //                //we must call this once per frame
-            //                result = _system.update();
-            //                CheckError(result);
-
-            //                //return to resting after executing a play control command
-            //                PlayControl = PlaybackControl.Neutral;
-
-            //                //wait
-            //                Thread.Sleep(5);
-            //            }
-
-            //        }, _playbackCts.Token);
-
-            //        //ensure everything knows that playback has stopped
-            //        IsPlaying = false;
-            //    }
-
-            //});
+            
         }
 
         /// <summary>
@@ -480,9 +340,9 @@ namespace X2MP.Core
             //play the sound on the channel
             result = _system.playSound(_sound, null, true, out _channel);
             CheckError(result);
-                        
+
             //create the dsp, although it will not be active at this time
-            result = _system.createDSP(ref dspDesc, out _dsp);
+            result = _system.createDSP(ref _dspDesc, out _dsp);
 
             ////deactivate
             //_dsp.setBypass(true);
@@ -496,17 +356,24 @@ namespace X2MP.Core
 
             ////activate
             //_dsp.setBypass(false);
-            
-            
 
             //hold the thread hostage
             while (GetIsPlaying())
             {
+                //check to see if playback should stop
+                if (_playbackCts.IsCancellationRequested)
+                {
+                    //we requested to stop playback
+                    break;
+                }
+
+                //update fmod
                 Update();
 
+                //get the current position
                 InternalPosition = GetPosition();
 
-
+                //sleep for a few miliseconds
                 Thread.Sleep(25);
 
             }
@@ -532,56 +399,25 @@ namespace X2MP.Core
         /// <summary>
         /// Stops playback
         /// </summary>
-        public async Task StopAsync()
+        public void Stop()
         {
-            //stops playback of the media
+            //cancel
             _playbackCts.Cancel();
 
-            await Task.Run(() =>
+            //stop playback
+            if (_channel != null)
             {
-                //wait until IsPlaying is false
-                while (IsPlaying)
-                {
-                    Thread.Sleep(5);
-                }
+                _channel.stop();
+                _channel = null;
 
-            });
+                _sound.release();
+                _sound = null;
+            }
+
+            
         }
 
-        /// <summary>
-        /// Stops the playback of the channel and destroys the channel
-        /// </summary>
-        private async Task StopStreamAsync(FMOD.Channel channel, MediaInfo media)
-        {
-
-            await Task.Run(() =>
-            {
-                FMOD.RESULT result;
-                //fade out
-                //TODO replace 1.0 with current volume level
-                for (float x = 1.0f; x > 0; x -= 0.05f)
-                {
-                    //set volume
-                    result = channel.setVolume(x);
-                    CheckError(result);
-
-                    //sleep
-                    Thread.Sleep(25);
-
-                }
-
-                //stop playback
-                result = channel.stop();
-                CheckError(result);
-
-                //release the sound
-                result = media.Sound.release();
-                CheckError(result);
-
-
-            });
-
-        }
+        
 
         #endregion
 
@@ -614,7 +450,7 @@ namespace X2MP.Core
             if (this._channel == null) return false;
 
             FMOD.RESULT result;
-            bool isPlaying;
+            bool isPlaying = true;
 
             //get is playing
             result = _channel.isPlaying(out isPlaying);

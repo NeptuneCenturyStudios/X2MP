@@ -76,21 +76,21 @@ namespace X2MP
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             //stop playback
-            var stopTask = App.SoundEngine.StopAsync();
-
+            App.SoundEngine.Stop();
+            this.Close(); 
             //hide the window
-            this.Hide();
+            //this.Hide();
 
-            stopTask.ContinueWith((t) =>
-            {
-                //shutdown fmod
-                App.SoundEngine.Dispose();
+            //stopTask.ContinueWith((t) =>
+            //{
+            //    //shutdown fmod
+            //    App.SoundEngine.Dispose();
 
-                //shutdown app
-                //App.Current.Shutdown();
-                Dispatcher.Invoke(() => { this.Close(); });
+            //    //shutdown app
+            //    //App.Current.Shutdown();
+            //    Dispatcher.Invoke(() => { });
 
-            });
+            //});
 
         }
 

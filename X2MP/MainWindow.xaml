@@ -67,6 +67,10 @@
                         <Button Style="{StaticResource ControlButton}" >
                             <Image Source="/Resources/prev.png"/>
                         </Button>
+                        <Button Style="{StaticResource ControlButton}"
+                                Command="{Binding Stop}">
+                            <Image Source="/Resources/prev.png"/>
+                        </Button>
                         <Button Style="{StaticResource ControlButtonLarge}"
                             Command="{Binding Play}" >
                             <Image Source="/Resources/play.png"/>

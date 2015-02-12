@@ -92,6 +92,10 @@ namespace X2MP.Models
         /// </summary>
         public ICommand Play { get; private set; }
 
+        /// <summary>
+        /// Stops playback
+        /// </summary>
+        public ICommand Stop { get; private set; }
 
         #endregion
 
@@ -170,6 +174,9 @@ namespace X2MP.Models
                 
             });
 
+            Stop = new Command((parameter) => {
+                App.SoundEngine.Stop();
+            });
 
         }
         #endregion
