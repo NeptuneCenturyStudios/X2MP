@@ -13,7 +13,7 @@
 
     <!--main border around window-->
     <Border BorderThickness="1" BorderBrush="CornflowerBlue">
-        
+
         <Grid>
 
             <!--define a section for our controls which will always be visible-->
@@ -22,7 +22,7 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
-            
+
             <!--grid for menu items-->
             <Grid Grid.Row="0">
                 <StackPanel Orientation="Horizontal">
@@ -44,7 +44,9 @@
 
             <!--grid for everything else-->
             <Grid Grid.Row="1" >
-
+                <Canvas x:Name="vis" >
+                    
+                </Canvas>
                 <ContentControl Content="{Binding Component}"
                                 Margin="10"/>
 
@@ -78,7 +80,7 @@
                         <Button Style="{StaticResource ControlButton}" >
                             <Image Source="/Resources/next.png"/>
                         </Button>
-                        
+
                     </StackPanel>
 
                 </Grid>

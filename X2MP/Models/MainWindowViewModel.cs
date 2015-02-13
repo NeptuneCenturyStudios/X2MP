@@ -22,13 +22,13 @@ namespace X2MP.Models
         #endregion
 
         #region Properties
-
+        Graphics g;
         /// <summary>
         /// Reference to main window for this view model
         /// </summary>
         public MainWindow Window { get; private set; }
 
-        private Image _backbuffer;
+        //private Image _backbuffer;
         private Image _visualization;
         public Image Visualization
         {
@@ -183,44 +183,49 @@ namespace X2MP.Models
 
         #region Visualization Methods
 
+         
+
         /// <summary>
         /// Creates a backbuffer to draw on
         /// </summary>
         private void CreateBackbuffer()
         {
-            //if we have to create it again, destroy it
-            if (_backbuffer != null)
-            {
-                _backbuffer.Dispose();
-                Visualization.Dispose();
-            }
+           
+            ////if we have to create it again, destroy it
+            //if (_backbuffer != null)
+            //{
+            //    _backbuffer.Dispose();
+            //    Visualization.Dispose();
+            //}
 
-            //create back buffer
-            _backbuffer = new Bitmap((int)Window.Width, (int)Window.Height);
+            ////create back buffer
+            //_backbuffer = new Bitmap((int)Window.Width, (int)Window.Height);
 
-            Visualization = new Bitmap((int)Window.Width, (int)Window.Height);
+            _visualization = new Bitmap((int)Window.Width, (int)Window.Height);
+
+            g = Graphics.FromImage(_visualization);
         }
-
+        
         /// <summary>
         /// Renders the visualization to the backbuffer
         /// </summary>
         private void RenderVisualization()
         {
-            using (var g = Graphics.FromImage(_backbuffer))
-            {
-                //clear the drawing surface
-                g.Clear(Color.White);
+            ////using ()
+            ////{
+            //    //clear the drawing surface
+            //    g.Clear(Color.White);
 
-                //draw stuff - test
-                g.FillRectangle(Brushes.CornflowerBlue, new Rectangle(10, 10, 100, 100));
+            //    //draw stuff - test
+            //    g.FillRectangle(Brushes.CornflowerBlue, new Rectangle(10, 10, 100, 100));
 
-                //copy the image to the image we want to present
-                using (var pg = Graphics.FromImage(Visualization))
-                {
-                    //render the back buffer to our visualization
-                    pg.DrawImage(_backbuffer, new PointF(0, 0));
-                }
-            }
+            //    ////copy the image to the image we want to present
+            //    //using (var pg = Graphics.FromImage(Visualization))
+            //    //{
+            //    //    //render the back buffer to our visualization
+            //    //    pg.DrawImage(_backbuffer, new PointF(0, 0));
+            //    //}
+            ////}
 
             OnVisualizationUpdated();
 

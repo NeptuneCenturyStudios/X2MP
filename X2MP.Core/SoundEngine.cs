@@ -109,6 +109,8 @@ namespace X2MP.Core
             NowPlaying = new PlayList();
             //initialize internal playlist
             InternalPlayList = new List<PlayListEntry>();
+            //create cancellation token
+            _playbackCts = new CancellationTokenSource();
             
             FMOD.RESULT result;
 

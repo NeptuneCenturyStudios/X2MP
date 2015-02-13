@@ -56,14 +56,30 @@ namespace X2MP
 
         void model_VisualizationUpdated(object sender, EventArgs e)
         {
-            Dispatcher.Invoke(() => {
-                //if (this.Background != null)
-                //{
-                //    var img = this.Background as ImageBrush;
-                    
-                //}
-                this.Background = new ImageBrush(LoadBitmap((Bitmap)(sender as MainWindowViewModel).Visualization));
+            Dispatcher.Invoke(() =>
+            {
+
+                vis.Children.Clear();
+                vis.Children.Add(new Line() { X1 = 10, Y1 = 10, X2 = 50, Y2 = 50, Stroke = System.Windows.Media.Brushes.Black, StrokeThickness = 4 });
             });
+            
+    //        <Line
+    //X1="10" Y1="10"
+    //X2="50" Y2="50"
+    //Stroke="Black"
+    //StrokeThickness="4" />
+
+            
+
+
+            //Dispatcher.Invoke(() => {
+            //    //if (this.Background != null)
+            //    //{
+            //    //    var img = this.Background as ImageBrush;
+                    
+            //    //}
+            //    this.Background = new ImageBrush(LoadBitmap((Bitmap)(sender as MainWindowViewModel).Visualization));
+            //});
             
         }
 
