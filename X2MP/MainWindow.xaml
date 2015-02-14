@@ -1,6 +1,7 @@
 ﻿<Window x:Class="X2MP.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:X2MP"
         Title="X2 Media Player"
         Height="400"
         Width="650" 
@@ -31,7 +32,7 @@
                             Click="CloseButton_Click">
                         <Image Source="/Resources/power.png"/>
                     </Button>
-                    <Button>
+                    <Button Command="{Binding OpenCollection}">
                         Collection
                     </Button>
 
@@ -44,11 +45,23 @@
 
             <!--grid for everything else-->
             <Grid Grid.Row="1" >
+                
+                <!--<Image x:Name="vis" Width="648" Height="270" >
+                    
+                </Image>-->
+                <!--<c:RenderCanvas x:Name="vis"></c:RenderCanvas>-->
                 <Canvas x:Name="vis" >
                     
+                    <Image x:Name="vimg"/>
+                    
                 </Canvas>
+                <!--<WindowsFormsHost Grid.ColumnSpan="2" >
+                    <local:Visualizer x:Name="vis" Width="500" Height="270" />
+                </WindowsFormsHost>-->
+
+
                 <ContentControl Content="{Binding Component}"
-                                Margin="10"/>
+                                Margin="10" Grid.ColumnSpan="2"/>
 
             </Grid>
 

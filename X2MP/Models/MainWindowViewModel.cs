@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace X2MP.Models
     {
         #region Events
 
-        public event EventHandler VisualizationUpdated;
+        public event EventHandler<VisualizationUpdatedEventArgs> VisualizationUpdated;
 
         #endregion
 
@@ -88,6 +89,11 @@ namespace X2MP.Models
         public ICommand OpenNowPlaying { get; private set; }
 
         /// <summary>
+        /// Gets the command for the now playing button
+        /// </summary>
+        public ICommand OpenCollection { get; private set; }
+
+        /// <summary>
         /// Begins playback or pauses
         /// </summary>
         public ICommand Play { get; private set; }
@@ -123,15 +129,7 @@ namespace X2MP.Models
 
 
 
-            Task.Run(() =>
-            {
-                while (true)
-                {
-                    RenderVisualization();
 
-                    Thread.Sleep(25);
-                }
-            });
         }
 
         #endregion
@@ -146,10 +144,17 @@ namespace X2MP.Models
                 Component = new NowPlayingUserControl();
             });
 
+            //open collection view
+            OpenCollection = new Command((parameter) =>
+            {
+                //display the Now Playing component
+                Component = null;
+            });
+
             Play = new Command((parameter) =>
             {
                 var playList = new List<PlayListEntry>();
-                
+
                 foreach (var entry in App.SoundEngine.NowPlaying)
                 {
                     playList.Add(entry);
@@ -171,10 +176,30 @@ namespace X2MP.Models
 
                 App.SoundEngine.PlayOrPause();
 
-                
+                //start pulling the WaveData
+                //Task.Run(() =>
+                //{
+                //    while (true)
+                //    {
+                //        RenderVisualization();
+
+                //        Thread.Sleep(25);
+                //    }
+                //});
+
+                System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+                dispatcherTimer.Tick += new EventHandler((sender, e) =>
+                {
+                    RenderVisualization();
+                });
+                dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 25);
+                dispatcherTimer.Start();
+
+
             });
 
-            Stop = new Command((parameter) => {
+            Stop = new Command((parameter) =>
+            {
                 App.SoundEngine.Stop();
             });
 
@@ -183,14 +208,14 @@ namespace X2MP.Models
 
         #region Visualization Methods
 
-         
+
 
         /// <summary>
         /// Creates a backbuffer to draw on
         /// </summary>
         private void CreateBackbuffer()
         {
-           
+
             ////if we have to create it again, destroy it
             //if (_backbuffer != null)
             //{
@@ -205,7 +230,7 @@ namespace X2MP.Models
 
             g = Graphics.FromImage(_visualization);
         }
-        
+
         /// <summary>
         /// Renders the visualization to the backbuffer
         /// </summary>
@@ -227,19 +252,30 @@ namespace X2MP.Models
             //    //}
             ////}
 
-            OnVisualizationUpdated();
+            if (App.SoundEngine.WaveData != null)
+            {
+                //copy the current buffer so we can work with it without fear of it changing,
+                //because it will change very, very quickly
+
+                var sampleBuffer = new float[App.SoundEngine.WaveData.Length];
+
+                Array.Copy(App.SoundEngine.WaveData, 0, sampleBuffer, 0, sampleBuffer.Length);
+                //var sampleBuffer = (float[])App.SoundEngine.WaveData.Clone();
+                //raise event
+                OnVisualizationUpdated(new VisualizationUpdatedEventArgs() { SampleBuffer = sampleBuffer });
+            }
 
         }
 
         #endregion
 
         #region Event Handlers
-        protected void OnVisualizationUpdated()
+        protected void OnVisualizationUpdated(VisualizationUpdatedEventArgs e)
         {
             var handler = VisualizationUpdated;
             if (handler != null)
             {
-                VisualizationUpdated(this, EventArgs.Empty);
+                VisualizationUpdated(this, e);
             }
         }
         #endregion

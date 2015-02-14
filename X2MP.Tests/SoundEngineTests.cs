@@ -17,23 +17,6 @@ namespace X2MP.Tests
             se.Dispose();
         }
 
-        [TestMethod]
-        public void TestPtrToStructure()
-        {
-            for (int x = 0; x < 10000000; x++)
-            {
-                var control = new SoundSystemControl();
-                control.TrackPlaying = true;
-                var ptr = Marshal.AllocHGlobal(Marshal.SizeOf(control));
-
-                Marshal.StructureToPtr(control, ptr, true);
-
-                //get
-                SoundSystemControl s = (SoundSystemControl)Marshal.PtrToStructure(ptr, typeof(SoundSystemControl));
-
-                Marshal.FreeHGlobal(ptr);
-            }
-
-        }
+        
     }
 }

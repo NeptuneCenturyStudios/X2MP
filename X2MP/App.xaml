@@ -8,6 +8,7 @@
         <Style TargetType="Window" x:Key="WindowStyle">
             <Setter Property="AllowsTransparency" Value="true" />
             <Setter Property="WindowStyle" Value="None" />
+            <Setter Property="Background" Value="White" />
         </Style>
 
         <Style TargetType="Button" x:Key="ImageButton">

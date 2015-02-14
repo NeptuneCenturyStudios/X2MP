@@ -14,7 +14,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using X2MP.Core;
 using X2MP.Models;
+using System.Windows.Interop;
 
 namespace X2MP
 {
@@ -54,33 +56,74 @@ namespace X2MP
             model.VisualizationUpdated += model_VisualizationUpdated;
         }
 
-        void model_VisualizationUpdated(object sender, EventArgs e)
+        double dpiX;
+        double dpiY;
+        //create pen
+        System.Windows.Media.Pen pen = new System.Windows.Media.Pen(System.Windows.Media.Brushes.Blue, 2);
+        DrawingVisual dv = new DrawingVisual();
+        RenderTargetBitmap bmp = null;
+        void model_VisualizationUpdated(object sender, VisualizationUpdatedEventArgs e)
         {
-            Dispatcher.Invoke(() =>
+
+            
+            var dc = dv.RenderOpen();
+
+
+            if (dpiX == 0 || dpiY == 0)
             {
+                PresentationSource src = PresentationSource.FromVisual(this);
+                dpiX = 96 * src.CompositionTarget.TransformToDevice.M11;
+                dpiY = 96 * src.CompositionTarget.TransformToDevice.M22;
+            }
 
-                vis.Children.Clear();
-                vis.Children.Add(new Line() { X1 = 10, Y1 = 10, X2 = 50, Y2 = 50, Stroke = System.Windows.Media.Brushes.Black, StrokeThickness = 4 });
-            });
-            
-    //        <Line
-    //X1="10" Y1="10"
-    //X2="50" Y2="50"
-    //Stroke="Black"
-    //StrokeThickness="4" />
+            var width = vis.ActualWidth;
+            var height = vis.ActualHeight;
 
-            
+            int numPoints = 128;
+            int skip = e.SampleBuffer.Length / numPoints;
+
+            double lineSpacing = (width / (numPoints)); //256 points
+            double startX = 0;
+            double startY = (height / 2);
+
+            //dc.Draw
+
+            //for now, we will only work with waveform
+            for (var x = 0; x < numPoints; x++)
+            {
+                float scale = (1 / ((float)(height / 64)));
+                float data1 = e.SampleBuffer[x * skip] / scale;
+                float data2 = e.SampleBuffer[(x * skip) + 1] / scale;
+
+                var data = (data1 + data2) / 2;//
+
+                double endX = startX + lineSpacing;
+                double endY = startY + data;
+
+                dc.DrawLine(
+                    pen,
+                    new System.Windows.Point(startX, startY),
+                    new System.Windows.Point(endX, endY)
+                    );
+
+                //next start is last end
+                startX = endX;
+                startY = endY;
+            }
 
 
-            //Dispatcher.Invoke(() => {
-            //    //if (this.Background != null)
-            //    //{
-            //    //    var img = this.Background as ImageBrush;
-                    
-            //    //}
-            //    this.Background = new ImageBrush(LoadBitmap((Bitmap)(sender as MainWindowViewModel).Visualization));
-            //});
-            
+            //get ready to display
+            dc.Close();
+            //if (bmp == null || bmp.Width != (int)width || bmp.Height != (int)height)
+            {
+                
+                bmp = new RenderTargetBitmap((int)width, (int)height, dpiX, dpiY, PixelFormats.Pbgra32);
+            }
+
+            bmp.Render(dv);
+            vimg.Source = bmp;
+
+
         }
 
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -93,7 +136,7 @@ namespace X2MP
         {
             //stop playback
             App.SoundEngine.Stop();
-            this.Close(); 
+            this.Close();
             //hide the window
             //this.Hide();
 
@@ -145,7 +188,7 @@ namespace X2MP
             slider.SetValue(Slider.ValueProperty, value);
         }
 
-        
+
 
     }
 }

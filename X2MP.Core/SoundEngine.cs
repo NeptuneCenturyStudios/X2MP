@@ -46,6 +46,11 @@ namespace X2MP.Core
         private List<PlayListEntry> InternalPlayList { get; set; }
 
         /// <summary>
+        /// Gets the current wave data frame from the DSP unit
+        /// </summary>
+        public float[] WaveData { get { return _sampleBuffer; } }
+
+        /// <summary>
         /// Gets the currently playing playlist.
         /// </summary>
         public PlayList NowPlaying { get; private set; }
@@ -111,7 +116,7 @@ namespace X2MP.Core
             InternalPlayList = new List<PlayListEntry>();
             //create cancellation token
             _playbackCts = new CancellationTokenSource();
-            
+
             FMOD.RESULT result;
 
             //create the system object   
@@ -196,10 +201,11 @@ namespace X2MP.Core
                 //create a buffer if we don't have one, or if the length has changed.
                 if (_sampleBuffer == null || _sampleBuffer.Length != bufferLength)
                 {
+                    //create new instance of the buffer
                     _sampleBuffer = new float[bufferLength];
                 }
 
-                //copy buffer
+                //copy outbuffer to our sample buffer
                 Marshal.Copy(outbuffer, _sampleBuffer, 0, _sampleBuffer.Length);
 
             }
@@ -289,7 +295,7 @@ namespace X2MP.Core
             {
                 return;
             }
-            
+
             //create new cancellation token
             _playbackCts = new CancellationTokenSource();
 
@@ -312,7 +318,7 @@ namespace X2MP.Core
                 Play();
             });
 
-            
+
         }
 
         /// <summary>
@@ -416,10 +422,10 @@ namespace X2MP.Core
                 _sound = null;
             }
 
-            
+
         }
 
-        
+
 
         #endregion
 
