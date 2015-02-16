@@ -214,9 +214,7 @@ namespace X2MP.Core
             return FMOD.RESULT.OK;
         }
         #endregion
-
-
-
+        
         #region Playback Methods
 
         /// <summary>
@@ -516,6 +514,13 @@ namespace X2MP.Core
             CheckError(result);
         }
 
+        #endregion
+
+        #region Playlist Methods
+        public void AddToNowPlaying(PlayListEntry entry)
+        {
+
+        }
         #endregion
 
         #region Helper Methods
