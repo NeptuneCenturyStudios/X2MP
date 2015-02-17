@@ -40,12 +40,24 @@
         </Style>
 
         <Style TargetType="Button" x:Key="ControlButton">
-
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Margin" Value="5" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
 
-                        <Border BorderThickness="2" BorderBrush="LightGray" Width="32" Height="32" Margin="5" CornerRadius="32">
+                        <Border BorderThickness="2" BorderBrush="LightGray" 
+                                Width="{Binding Width, 
+                                            RelativeSource={RelativeSource Mode=FindAncestor, 
+                                                AncestorType={x:Type Button }}}" 
+                                Height="{Binding Height, 
+                                            RelativeSource={RelativeSource Mode=FindAncestor, 
+                                                AncestorType={x:Type Button }}}"  
+                                CornerRadius="{Binding Width, 
+                                            RelativeSource={RelativeSource Mode=FindAncestor, 
+                                                AncestorType={x:Type Button }}}"
+                                >
                             <Border.Style>
                                 <Style>
                                     <Setter Property="Border.Background" Value="Transparent"/>
@@ -56,35 +68,6 @@
                                     </Style.Triggers>
                                 </Style>
                             </Border.Style>
-                            <Grid>
-                                <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
-                            </Grid>
-                        </Border>
-                    </ControlTemplate>
-
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style TargetType="Button" x:Key="ControlButtonLarge">
-
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-
-                        <Border BorderThickness="2" BorderBrush="LightGray" Width="48" Height="48" Margin="5" CornerRadius="48">
-                            <Border.Style>
-                                <Style>
-                                    <Setter Property="Border.Background" Value="Transparent"/>
-                                    <Style.Triggers>
-                                        <Trigger Property="Border.IsMouseOver" Value="True">
-                                            <Setter Property="Border.Background" Value="LightGray" />
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
-
                             <Grid>
                                 <ContentPresenter HorizontalAlignment="Center"
                                               VerticalAlignment="Center"/>

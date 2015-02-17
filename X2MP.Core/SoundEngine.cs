@@ -16,7 +16,6 @@ namespace X2MP.Core
         #region Events
 
         public event PropertyChangedEventHandler PropertyChanged;
-        public event EventHandler<NeedNextMediaEventArgs> NeedNextMedia;
 
         #endregion
 
@@ -36,9 +35,24 @@ namespace X2MP.Core
         /// </summary>
         private CancellationTokenSource _playbackCts;
 
+        private PlayListEntry _playingEntry;
+
         #endregion
 
         #region Properties
+
+        private int _playListIndex;
+        private int PlayListIndex
+        {
+            get
+            {
+                return _playListIndex;
+            }
+            set
+            {
+                _playListIndex = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the internal playlist from which FMOD gets its streams
@@ -214,7 +228,7 @@ namespace X2MP.Core
             return FMOD.RESULT.OK;
         }
         #endregion
-        
+
         #region Playback Methods
 
         /// <summary>
@@ -286,7 +300,7 @@ namespace X2MP.Core
 
             //get some media to play
             var entry = GetNextMedia();
-
+            _playingEntry = entry;
             //check to see if there are
             if (entry == null)
             {
@@ -301,12 +315,18 @@ namespace X2MP.Core
             {
                 //send the media to be played
                 LoadMedia(entry);
+
+                //set playing
+                _playingEntry.IsPlaying = true;
+
                 //play the stream
                 PlayStream();
             }, _playbackCts.Token);
 
             playTask.ContinueWith((t) =>
             {
+                _playingEntry.IsPlaying = false;
+
                 if (_playbackCts.IsCancellationRequested)
                 {
                     return;
@@ -516,7 +536,7 @@ namespace X2MP.Core
         #endregion
 
         #region Playlist Methods
-        
+
         /// <summary>
         /// Adds a new entry to the now playing list, and adds it to the internal playlist if currently playing
         /// </summary>
