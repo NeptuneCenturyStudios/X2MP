@@ -43,10 +43,12 @@
             </ListView.View>
 
         </ListView>
-        <StackPanel Grid.Row="2" Visibility="Visible" Orientation="Horizontal" Style="{DynamicResource ResourceKey=StackPanelVisibilityStyle}">
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Style="{DynamicResource ResourceKey=StackPanelVisibilityStyle}">
             <Button Style="{StaticResource ControlButton}"
-                                Command="{Binding DeleteItem}" CommandParameter="{Binding SelectedItem, ElementName=NowPlayingListView}">
-                <Image Source="/Resources/stop.png"/>
+                    Command="{Binding DeleteItem}"
+                    CommandParameter="{Binding SelectedItem, ElementName=NowPlayingListView}"
+                    ToolTip="Remove item from Now Playing">
+                <Image Source="/Resources/delete.png"/>
             </Button>
         </StackPanel>
 
