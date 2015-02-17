@@ -67,7 +67,7 @@ namespace X2MP.Models
                         var playlistEntry = new PlayListEntry() { TagInfo = tagInfo, FileName = file };
 
                         //add to now playing
-                        NowPlaying.Add(playlistEntry);
+                        App.SoundEngine.AddToNowPlaying(playlistEntry);
 
                     }
                 }

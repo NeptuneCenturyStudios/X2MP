@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using X2MP.Core;
 
 namespace X2MP.Models
@@ -22,8 +23,13 @@ namespace X2MP.Models
 
         #endregion
 
+        #region Fields
+        
+        private DispatcherTimer _visTimer;
+        #endregion
+
         #region Properties
-        Graphics g;
+
         /// <summary>
         /// Reference to main window for this view model
         /// </summary>
@@ -112,10 +118,15 @@ namespace X2MP.Models
             Window = window;
 
             Component = null;
-
-            //create the back buffer to render visuals
-            CreateBackbuffer();
-
+                       
+            //create timer. we are using timer because it performs better than a thread in
+            //in this case. uses less CPU.
+            _visTimer = new DispatcherTimer();
+            _visTimer.Interval = new TimeSpan(0, 0, 0, 0, 25);
+            _visTimer.Tick += new EventHandler((sender, e) =>
+            {
+                RenderVisualization();
+            });
 
             //hook up properties
             App.SoundEngine.PropertyChanged += (object sender, PropertyChangedEventArgs e) =>
@@ -153,53 +164,22 @@ namespace X2MP.Models
 
             Play = new Command((parameter) =>
             {
-                var playList = new List<PlayListEntry>();
-
-                foreach (var entry in App.SoundEngine.NowPlaying)
-                {
-                    playList.Add(entry);
-                }
-
-                App.SoundEngine.NeedNextMedia += (sender, e) =>
-                {
-                    if (playList.Count > 0)
-                    {
-                        //feed the sound engine
-                        var entry = playList[0];
-
-                        e.Media = entry;
-
-                        //remove entry from list
-                        playList.Remove(entry);
-                    }
-                };
 
                 App.SoundEngine.PlayOrPause();
 
-                //start pulling the WaveData
-                //Task.Run(() =>
-                //{
-                //    while (true)
-                //    {
-                //        RenderVisualization();
-
-                //        Thread.Sleep(25);
-                //    }
-                //});
-
-                System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
-                dispatcherTimer.Tick += new EventHandler((sender, e) =>
-                {
-                    RenderVisualization();
-                });
-                dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 25);
-                dispatcherTimer.Start();
+                //make sure it is stopped!
+                _visTimer.Stop();
+                //start it
+                _visTimer.Start();
 
 
             });
 
             Stop = new Command((parameter) =>
             {
+                //cancel visualization task
+                _visTimer.Stop();
+
                 App.SoundEngine.Stop();
             });
 
@@ -209,58 +189,21 @@ namespace X2MP.Models
         #region Visualization Methods
 
 
-
-        /// <summary>
-        /// Creates a backbuffer to draw on
-        /// </summary>
-        private void CreateBackbuffer()
-        {
-
-            ////if we have to create it again, destroy it
-            //if (_backbuffer != null)
-            //{
-            //    _backbuffer.Dispose();
-            //    Visualization.Dispose();
-            //}
-
-            ////create back buffer
-            //_backbuffer = new Bitmap((int)Window.Width, (int)Window.Height);
-
-            _visualization = new Bitmap((int)Window.Width, (int)Window.Height);
-
-            g = Graphics.FromImage(_visualization);
-        }
-
         /// <summary>
         /// Renders the visualization to the backbuffer
         /// </summary>
         private void RenderVisualization()
         {
-            ////using ()
-            ////{
-            //    //clear the drawing surface
-            //    g.Clear(Color.White);
-
-            //    //draw stuff - test
-            //    g.FillRectangle(Brushes.CornflowerBlue, new Rectangle(10, 10, 100, 100));
-
-            //    ////copy the image to the image we want to present
-            //    //using (var pg = Graphics.FromImage(Visualization))
-            //    //{
-            //    //    //render the back buffer to our visualization
-            //    //    pg.DrawImage(_backbuffer, new PointF(0, 0));
-            //    //}
-            ////}
 
             if (App.SoundEngine.WaveData != null)
             {
                 //copy the current buffer so we can work with it without fear of it changing,
                 //because it will change very, very quickly
-
                 var sampleBuffer = new float[App.SoundEngine.WaveData.Length];
 
+                //copy
                 Array.Copy(App.SoundEngine.WaveData, 0, sampleBuffer, 0, sampleBuffer.Length);
-                //var sampleBuffer = (float[])App.SoundEngine.WaveData.Clone();
+
                 //raise event
                 OnVisualizationUpdated(new VisualizationUpdatedEventArgs() { SampleBuffer = sampleBuffer });
             }

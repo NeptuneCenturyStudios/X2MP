@@ -12,6 +12,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Text="Drop files here or add them from your collection" 
@@ -27,5 +28,11 @@
                 </GridView>
             </ListView.View>
         </ListView>
+
+        <StackPanel x:Name="Commands" Grid.Row="2" Visibility="Collapsed" Orientation="Horizontal" >
+            <Button >
+                Delete
+            </Button>
+        </StackPanel>
     </Grid>
 </UserControl>

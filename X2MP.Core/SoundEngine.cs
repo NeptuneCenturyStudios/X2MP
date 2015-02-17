@@ -238,6 +238,8 @@ namespace X2MP.Core
             }
             else
             {
+                //build a playlist
+                BuildInternalPlaylist();
                 //nothing is playing, play something
                 Play();
             }
@@ -283,13 +285,10 @@ namespace X2MP.Core
         {
 
             //get some media to play
-            var args = new NeedNextMediaEventArgs();
-
-            //fire event
-            OnNeedNextMedia(args);
+            var entry = GetNextMedia();
 
             //check to see if there are
-            if (args.Media == null)
+            if (entry == null)
             {
                 return;
             }
@@ -301,7 +300,7 @@ namespace X2MP.Core
             var playTask = Task.Run(() =>
             {
                 //send the media to be played
-                LoadMedia(args.Media);
+                LoadMedia(entry);
                 //play the stream
                 PlayStream();
             }, _playbackCts.Token);
@@ -517,10 +516,57 @@ namespace X2MP.Core
         #endregion
 
         #region Playlist Methods
+        
+        /// <summary>
+        /// Adds a new entry to the now playing list, and adds it to the internal playlist if currently playing
+        /// </summary>
+        /// <param name="entry"></param>
         public void AddToNowPlaying(PlayListEntry entry)
         {
+            //add media entry to the now playing playlist
+            NowPlaying.Add(entry);
 
+            //if we are currently playing, we need to add this to the internal
+            //playlist as well
+            if (GetIsPlaying())
+            {
+                //add to internal playlist
+                InternalPlayList.Add(entry);
+            }
         }
+
+        /// <summary>
+        /// Builds the internal playlist based on settings like Randomize, etc...
+        /// </summary>
+        private void BuildInternalPlaylist()
+        {
+            foreach (var entry in NowPlaying)
+            {
+                InternalPlayList.Add(entry);
+            }
+        }
+
+        /// <summary>
+        /// Gets the next media in the list
+        /// </summary>
+        /// <returns></returns>
+        private PlayListEntry GetNextMedia()
+        {
+            if (InternalPlayList.Count > 0)
+            {
+                //feed the sound engine
+                var entry = InternalPlayList[0];
+                //remove entry from list
+                InternalPlayList.Remove(entry);
+
+                return entry;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         #endregion
 
         #region Helper Methods
@@ -557,15 +603,15 @@ namespace X2MP.Core
             }
         }
 
-        protected void OnNeedNextMedia(NeedNextMediaEventArgs e)
-        {
-            //fire event
-            var handler = NeedNextMedia;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
+        //protected void OnNeedNextMedia(NeedNextMediaEventArgs e)
+        //{
+        //    //fire event
+        //    var handler = NeedNextMedia;
+        //    if (handler != null)
+        //    {
+        //        handler(this, e);
+        //    }
+        //}
 
         #endregion
 

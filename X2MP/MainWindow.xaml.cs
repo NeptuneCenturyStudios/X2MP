@@ -25,26 +25,26 @@ namespace X2MP
     /// </summary>
     public partial class MainWindow : Window
     {
-        [DllImport("gdi32")]
-        static extern int DeleteObject(IntPtr o);
+        //[DllImport("gdi32")]
+        //static extern int DeleteObject(IntPtr o);
 
-        public static BitmapSource LoadBitmap(System.Drawing.Bitmap source)
-        {
-            IntPtr ip = source.GetHbitmap();
-            BitmapSource bs = null;
-            try
-            {
-                bs = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(ip,
-                   IntPtr.Zero, Int32Rect.Empty,
-                   System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
-            }
-            finally
-            {
-                DeleteObject(ip);
-            }
+        //public static BitmapSource LoadBitmap(System.Drawing.Bitmap source)
+        //{
+        //    IntPtr ip = source.GetHbitmap();
+        //    BitmapSource bs = null;
+        //    try
+        //    {
+        //        bs = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(ip,
+        //           IntPtr.Zero, Int32Rect.Empty,
+        //           System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
+        //    }
+        //    finally
+        //    {
+        //        DeleteObject(ip);
+        //    }
 
-            return bs;
-        }
+        //    return bs;
+        //}
 
         public MainWindow()
         {
@@ -64,66 +64,67 @@ namespace X2MP
         RenderTargetBitmap bmp = null;
         void model_VisualizationUpdated(object sender, VisualizationUpdatedEventArgs e)
         {
+            //Dispatcher.Invoke(() =>
+            //{
 
-            
-            var dc = dv.RenderOpen();
-
-
-            if (dpiX == 0 || dpiY == 0)
-            {
-                PresentationSource src = PresentationSource.FromVisual(this);
-                dpiX = 96 * src.CompositionTarget.TransformToDevice.M11;
-                dpiY = 96 * src.CompositionTarget.TransformToDevice.M22;
-            }
-
-            var width = vis.ActualWidth;
-            var height = vis.ActualHeight;
-
-            int numPoints = 128;
-            int skip = e.SampleBuffer.Length / numPoints;
-
-            double lineSpacing = (width / (numPoints)); //256 points
-            double startX = 0;
-            double startY = (height / 2);
-
-            //dc.Draw
-
-            //for now, we will only work with waveform
-            for (var x = 0; x < numPoints; x++)
-            {
-                float scale = (1 / ((float)(height / 64)));
-                float data1 = e.SampleBuffer[x * skip] / scale;
-                float data2 = e.SampleBuffer[(x * skip) + 1] / scale;
-
-                var data = (data1 + data2) / 2;//
-
-                double endX = startX + lineSpacing;
-                double endY = startY + data;
-
-                dc.DrawLine(
-                    pen,
-                    new System.Windows.Point(startX, startY),
-                    new System.Windows.Point(endX, endY)
-                    );
-
-                //next start is last end
-                startX = endX;
-                startY = endY;
-            }
+                var dc = dv.RenderOpen();
 
 
-            //get ready to display
-            dc.Close();
-            //if (bmp == null || bmp.Width != (int)width || bmp.Height != (int)height)
-            {
-                
-                bmp = new RenderTargetBitmap((int)width, (int)height, dpiX, dpiY, PixelFormats.Pbgra32);
-            }
+                if (dpiX == 0 || dpiY == 0)
+                {
+                    PresentationSource src = PresentationSource.FromVisual(this);
+                    dpiX = 96 * src.CompositionTarget.TransformToDevice.M11;
+                    dpiY = 96 * src.CompositionTarget.TransformToDevice.M22;
+                }
 
-            bmp.Render(dv);
-            vimg.Source = bmp;
+                var width = vis.ActualWidth;
+                var height = vis.ActualHeight;
+
+                int numPoints = 128;
+                int skip = e.SampleBuffer.Length / numPoints;
+
+                double lineSpacing = (width / (numPoints)); //256 points
+                double startX = 0;
+                double startY = (height / 2);
+
+                //dc.Draw
+
+                //for now, we will only work with waveform
+                for (var x = 0; x < numPoints; x++)
+                {
+                    float scale = (1 / ((float)(height / 64)));
+                    float data1 = e.SampleBuffer[x * skip] / scale;
+                    float data2 = e.SampleBuffer[(x * skip) + 1] / scale;
+
+                    var data = (data1 + data2) / 2;//
+
+                    double endX = startX + lineSpacing;
+                    double endY = startY + data;
+
+                    dc.DrawLine(
+                        pen,
+                        new System.Windows.Point(startX, startY),
+                        new System.Windows.Point(endX, endY)
+                        );
+
+                    //next start is last end
+                    startX = endX;
+                    startY = endY;
+                }
 
 
+                //get ready to display
+                dc.Close();
+                //if (bmp == null || bmp.Width != (int)width || bmp.Height != (int)height)
+                {
+
+                    bmp = new RenderTargetBitmap((int)width, (int)height, dpiX, dpiY, PixelFormats.Pbgra32);
+                }
+
+                bmp.Render(dv);
+                vimg.Source = bmp;
+
+            //}, System.Windows.Threading.DispatcherPriority.Render);
         }
 
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
