@@ -536,6 +536,26 @@ namespace X2MP.Core
         }
 
         /// <summary>
+        /// Removes an entry from the playlist
+        /// </summary>
+        /// <param name="entry"></param>
+        public void RemoveFromNowPlaying(PlayListEntry entry)
+        {
+            //remove
+            NowPlaying.Remove(entry);
+
+            //if we are currently playing, we need to add this to the internal
+            //playlist as well
+            if (GetIsPlaying())
+            {
+                //add to internal playlist
+                InternalPlayList.Remove(entry);
+
+                //stop playback if this is the entry we are currently playing
+            }
+        }
+
+        /// <summary>
         /// Builds the internal playlist based on settings like Randomize, etc...
         /// </summary>
         private void BuildInternalPlaylist()

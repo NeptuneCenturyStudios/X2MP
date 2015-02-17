@@ -5,6 +5,18 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
+
+    <UserControl.Resources>
+        <Style TargetType="StackPanel" x:Key="StackPanelVisibilityStyle">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=SelectedItem, ElementName=NowPlayingListView}" Value="{x:Null}">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+
     <Grid AllowDrop="True"
           DragOver="Grid_DragOver"
           Drop="Grid_Drop">
@@ -18,7 +30,9 @@
         <TextBlock Grid.Row="0" Text="Drop files here or add them from your collection" 
                    Style="{StaticResource MediumText}" Foreground="Gray" HorizontalAlignment="Center" />
 
-        <ListView Grid.Row="1" ItemsSource="{ Binding NowPlaying }" Opacity="0.75">
+        <ListView x:Name="NowPlayingListView" Grid.Row="1" ItemsSource="{ Binding NowPlaying }" Opacity="0.75">
+
+
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Track" Width="50" DisplayMemberBinding="{Binding TagInfo.Track}" />
@@ -27,12 +41,14 @@
                     <GridViewColumn Header="Artist" Width="150" DisplayMemberBinding="{Binding TagInfo.Artist}" />
                 </GridView>
             </ListView.View>
-        </ListView>
 
-        <StackPanel x:Name="Commands" Grid.Row="2" Visibility="Collapsed" Orientation="Horizontal" >
-            <Button >
-                Delete
+        </ListView>
+        <StackPanel Grid.Row="2" Visibility="Visible" Orientation="Horizontal" Style="{DynamicResource ResourceKey=StackPanelVisibilityStyle}">
+            <Button Style="{StaticResource ControlButton}"
+                                Command="{Binding DeleteItem}" CommandParameter="{Binding SelectedItem, ElementName=NowPlayingListView}">
+                <Image Source="/Resources/stop.png"/>
             </Button>
         </StackPanel>
+
     </Grid>
 </UserControl>

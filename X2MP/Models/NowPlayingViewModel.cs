@@ -29,7 +29,10 @@ namespace X2MP.Models
         }
 
         #region Commands
-
+        /// <summary>
+        /// Gets the command for the now playing button
+        /// </summary>
+        public ICommand DeleteItem { get; private set; }
         #endregion
 
         #endregion
@@ -37,7 +40,7 @@ namespace X2MP.Models
         #region Constructor
         public NowPlayingViewModel()
         {
-
+            RegisterCommands();
         }
         #endregion
 
@@ -73,12 +76,21 @@ namespace X2MP.Models
                 }
             }
         }
+
+        public void DeleteEntry(PlayListEntry entry)
+        {
+            App.SoundEngine.RemoveFromNowPlaying(entry);
+        }
         #endregion
 
         #region Register Commands
         private void RegisterCommands()
         {
-
+            //delete a playlist item
+            DeleteItem = new Command((parameter) =>
+            {
+                DeleteEntry((PlayListEntry)parameter);
+            });
         }
         #endregion
 

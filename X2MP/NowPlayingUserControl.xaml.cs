@@ -41,8 +41,8 @@ namespace X2MP
 
         private void Grid_DragOver(object sender, DragEventArgs e)
         {
-            e.Effects= DragDropEffects.Move;
-            
+            e.Effects = DragDropEffects.Move;
+
         }
     }
 }

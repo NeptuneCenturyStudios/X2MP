@@ -95,7 +95,7 @@ namespace X2MP.Models
         public ICommand OpenNowPlaying { get; private set; }
 
         /// <summary>
-        /// Gets the command for the now playing button
+        /// Gets the command for the collection button
         /// </summary>
         public ICommand OpenCollection { get; private set; }
 
