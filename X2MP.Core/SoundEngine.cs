@@ -57,7 +57,7 @@ namespace X2MP.Core
         /// <summary>
         /// Gets or sets the internal playlist from which FMOD gets its streams
         /// </summary>
-        private List<PlayListEntry> InternalPlayList { get; set; }
+        //private List<PlayListEntry> InternalPlayList { get; set; }
 
         /// <summary>
         /// Gets the current wave data frame from the DSP unit
@@ -127,7 +127,7 @@ namespace X2MP.Core
             //initialize the playlist
             NowPlaying = new PlayList();
             //initialize internal playlist
-            InternalPlayList = new List<PlayListEntry>();
+            //InternalPlayList = new List<PlayListEntry>();
             //create cancellation token
             _playbackCts = new CancellationTokenSource();
 
@@ -252,8 +252,6 @@ namespace X2MP.Core
             }
             else
             {
-                //build a playlist
-                BuildInternalPlaylist();
                 //nothing is playing, play something
                 Play();
             }
@@ -392,11 +390,13 @@ namespace X2MP.Core
                     break;
                 }
 
+                //get the current position
+                InternalPosition = GetPosition();
+
                 //update fmod
                 Update();
 
-                //get the current position
-                InternalPosition = GetPosition();
+                
 
                 //sleep for a few miliseconds
                 Thread.Sleep(25);
@@ -551,7 +551,7 @@ namespace X2MP.Core
             if (GetIsPlaying())
             {
                 //add to internal playlist
-                InternalPlayList.Add(entry);
+                //InternalPlayList.Add(entry);
             }
         }
 
@@ -569,20 +569,9 @@ namespace X2MP.Core
             if (GetIsPlaying())
             {
                 //add to internal playlist
-                InternalPlayList.Remove(entry);
+                //InternalPlayList.Remove(entry);
 
                 //stop playback if this is the entry we are currently playing
-            }
-        }
-
-        /// <summary>
-        /// Builds the internal playlist based on settings like Randomize, etc...
-        /// </summary>
-        private void BuildInternalPlaylist()
-        {
-            foreach (var entry in NowPlaying)
-            {
-                InternalPlayList.Add(entry);
             }
         }
 
@@ -592,12 +581,19 @@ namespace X2MP.Core
         /// <returns></returns>
         private PlayListEntry GetNextMedia()
         {
-            if (InternalPlayList.Count > 0)
+            if (NowPlaying.Count > 0 && PlayListIndex < NowPlaying.Count - 1)
             {
-                //feed the sound engine
-                var entry = InternalPlayList[0];
-                //remove entry from list
-                InternalPlayList.Remove(entry);
+                //get the playlist entry from the current index
+                var entry = NowPlaying[PlayListIndex++];
+
+                if (PlayListIndex > NowPlaying.Count - 1)
+                {
+                    PlayListIndex = NowPlaying.Count - 1;
+                    //stop playback
+                    Stop();
+
+                    return null;
+                }
 
                 return entry;
             }
