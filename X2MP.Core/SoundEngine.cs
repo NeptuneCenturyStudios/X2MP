@@ -41,6 +41,9 @@ namespace X2MP.Core
 
         #region Properties
 
+        /// <summary>
+        /// Gets or sets the playlist index
+        /// </summary>
         private int _playListIndex;
         private int PlayListIndex
         {
