@@ -118,16 +118,16 @@ namespace X2MP.Core
         /// <summary>
         /// Gets whether the system is paused or not
         /// </summary>
-        private bool _isPaused;
-        public bool IsPaused
+        private bool _isPlaying;
+        public bool IsPlaying
         {
-            get { return _isPaused; }
+            get { return _isPlaying; }
             private set
             {
-                _isPaused = value;
+                _isPlaying = value;
 
                 //raise changed event
-                OnPropertyChanged("IsPaused");
+                OnPropertyChanged("IsPlaying");
             }
         }
         #endregion
@@ -141,8 +141,7 @@ namespace X2MP.Core
         {
             //initialize the playlist
             NowPlaying = new PlayList();
-            //initialize internal playlist
-            //InternalPlayList = new List<PlayListEntry>();
+
             //create cancellation token
             _playbackCts = new CancellationTokenSource();
 
@@ -257,7 +256,7 @@ namespace X2MP.Core
         /// <summary>
         /// Begins playback or pauses playback
         /// </summary>
-        public void PlayOrPause()
+        public void PlayOrPause(int index)
         {
             //if the track is playing, then pressing play again will pause the track
             if (GetIsPlaying())
@@ -267,6 +266,9 @@ namespace X2MP.Core
             }
             else
             {
+                //set playlist index
+                PlayListIndex = index;
+
                 //nothing is playing, play something
                 Play();
             }
@@ -314,14 +316,21 @@ namespace X2MP.Core
             //get some media to play
             var entry = GetNextMedia();
             _playingEntry = entry;
+
+            //set playing
+            IsPlaying = (_playingEntry != null);
+
             //check to see if there are
             if (entry == null)
             {
+                //nothing, so, return
                 return;
             }
 
             //create new cancellation token
             _playbackCts = new CancellationTokenSource();
+
+            
 
             //create a play task
             var playTask = Task.Run(() =>
@@ -332,18 +341,22 @@ namespace X2MP.Core
                 //set playing
                 _playingEntry.IsPlaying = true;
 
+
                 //play the stream
                 PlayStream();
             }, _playbackCts.Token);
 
             playTask.ContinueWith((t) =>
             {
+                //this entry is not playing any more
                 _playingEntry.IsPlaying = false;
 
+                //if canceled, exit
                 if (_playbackCts.IsCancellationRequested)
                 {
                     return;
                 }
+
                 //play the next song
                 Play();
             });
@@ -411,7 +424,7 @@ namespace X2MP.Core
                 //update fmod
                 Update();
 
-                
+
 
                 //sleep for a few miliseconds
                 Thread.Sleep(25);
@@ -428,14 +441,17 @@ namespace X2MP.Core
         {
             FMOD.RESULT result;
             bool paused;
+
+            //get paused status
             result = _channel.getPaused(out paused);
             CheckError(result);
 
+            //unpause or pause
             result = _channel.setPaused(!paused);
             CheckError(result);
 
             //set IsPaused property to notify listeners
-            IsPaused = paused;
+            IsPlaying = paused;
 
         }
 
@@ -446,6 +462,9 @@ namespace X2MP.Core
         {
             //cancel
             _playbackCts.Cancel();
+
+            //not playing now
+            IsPlaying = false;
 
             //stop playback
             if (_channel != null)
@@ -599,20 +618,20 @@ namespace X2MP.Core
         /// <returns></returns>
         private PlayListEntry GetNextMedia()
         {
-            if (NowPlaying.Count > 0 && PlayListIndex < NowPlaying.Count - 1)
+            if (NowPlaying.Count > 0 && PlayListIndex < NowPlaying.Count)
             {
                 //get the playlist entry from the current index
                 var entry = NowPlaying[PlayListIndex++];
 
                 if (PlayListIndex > NowPlaying.Count - 1)
                 {
-                    PlayListIndex = NowPlaying.Count - 1;
-                    //stop playback
-                    Stop();
 
-                    return null;
+                    //reset
+                    //PlayListIndex = 0;
+                                       
                 }
 
+                //return the entry we got
                 return entry;
             }
             else

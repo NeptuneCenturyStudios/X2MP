@@ -74,9 +74,9 @@ namespace X2MP.Models
         /// <summary>
         /// Gets whether the system is paused or not
         /// </summary>
-        public bool IsPaused
+        public bool IsPlaying
         {
-            get { return App.SoundEngine.IsPaused; }
+            get { return App.SoundEngine.IsPlaying; }
         }
 
         #endregion
@@ -110,7 +110,7 @@ namespace X2MP.Models
         public MainWindowViewModel(MainWindow window)
         {
             Window = window;
-
+            
             Component = null;
 
             //create timer. we are using timer because it performs better than a thread in
@@ -160,9 +160,9 @@ namespace X2MP.Models
             Play = new Command((parameter) =>
             {
                 //play or pause the song
-                App.SoundEngine.PlayOrPause();
+                App.SoundEngine.PlayOrPause(Convert.ToInt32(parameter));
 
-                if (IsPaused)
+                if (!IsPlaying)
                 {
                     //stop the timer
                     _visTimer.Stop();

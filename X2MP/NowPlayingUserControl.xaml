@@ -35,21 +35,21 @@
 
             <ListView.View>
                 <GridView>
-                    <GridViewColumn  Width="50" >
+                    <GridViewColumn >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock>
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
+                                <Image Source="/Resources/playing.png">
+                                    <Image.Style>
+                                        <Style TargetType="Image">
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsPlaying}" Value="false">
                                                     <Setter Property="Visibility" Value="Hidden"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
-                                    </TextBlock.Style>
-                                    >
-                                </TextBlock>
+                                    </Image.Style>
+                                    
+                                </Image>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
