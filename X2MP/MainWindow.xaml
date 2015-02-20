@@ -90,7 +90,23 @@
                                 Width="48"
                                 Height="48"
                             Command="{Binding Play}" >
-                            <Image Source="/Resources/play.png"/>
+                            
+                            <!--pause or play image, depending on player status-->
+                            <Image Source="/Resources/play.png">
+                                <Image.Resources>
+                                    <Style TargetType="Image">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsPaused}" Value="false">
+                                                <Setter Property="Source" Value="/Resources/pause.png"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsPaused}" Value="true">
+                                                <Setter Property="Source" Value="/Resources/play.png"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Image.Resources>
+                            </Image>
+                            
                         </Button>
                         <Button Style="{StaticResource ControlButton}" >
                             <Image Source="/Resources/next.png"/>

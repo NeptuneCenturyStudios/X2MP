@@ -24,7 +24,7 @@ namespace X2MP.Models
         #endregion
 
         #region Fields
-        
+
         private DispatcherTimer _visTimer;
         #endregion
 
@@ -34,21 +34,7 @@ namespace X2MP.Models
         /// Reference to main window for this view model
         /// </summary>
         public MainWindow Window { get; private set; }
-
-        //private Image _backbuffer;
-        private Image _visualization;
-        public Image Visualization
-        {
-            get
-            {
-                return _visualization;
-            }
-            private set
-            {
-                _visualization = value;
-            }
-        }
-
+                
         /// <summary>
         /// Gets the current visible component e.g. Now Playing
         /// </summary>
@@ -63,7 +49,7 @@ namespace X2MP.Models
             {
                 _component = value;
 
-                //property changes
+                //raise changed event
                 OnPropertyChanged(() => this.Component);
             }
         }
@@ -83,6 +69,14 @@ namespace X2MP.Models
         {
             get { return App.SoundEngine.Position; }
             set { App.SoundEngine.Position = value; }
+        }
+
+        /// <summary>
+        /// Gets whether the system is paused or not
+        /// </summary>
+        public bool IsPaused
+        {
+            get { return App.SoundEngine.IsPaused; }
         }
 
         #endregion
@@ -118,7 +112,7 @@ namespace X2MP.Models
             Window = window;
 
             Component = null;
-                       
+
             //create timer. we are using timer because it performs better than a thread in
             //in this case. uses less CPU.
             _visTimer = new DispatcherTimer();
@@ -162,19 +156,26 @@ namespace X2MP.Models
                 Component = null;
             });
 
+            //play or pause
             Play = new Command((parameter) =>
             {
-
+                //play or pause the song
                 App.SoundEngine.PlayOrPause();
 
-                //make sure it is stopped!
-                _visTimer.Stop();
-                //start it
-                _visTimer.Start();
-
+                if (IsPaused)
+                {
+                    //stop the timer
+                    _visTimer.Stop();
+                }
+                else if (!_visTimer.IsEnabled)
+                {
+                    //start it
+                    _visTimer.Start();
+                }
 
             });
 
+            //stop
             Stop = new Command((parameter) =>
             {
                 //cancel visualization task

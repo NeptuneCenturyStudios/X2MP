@@ -58,11 +58,6 @@ namespace X2MP.Core
         }
 
         /// <summary>
-        /// Gets or sets the internal playlist from which FMOD gets its streams
-        /// </summary>
-        //private List<PlayListEntry> InternalPlayList { get; set; }
-
-        /// <summary>
         /// Gets the current wave data frame from the DSP unit
         /// </summary>
         public float[] WaveData { get { return _sampleBuffer; } }
@@ -83,6 +78,7 @@ namespace X2MP.Core
             {
                 _length = value;
 
+                //raise changed event
                 OnPropertyChanged("Length");
             }
         }
@@ -114,10 +110,26 @@ namespace X2MP.Core
             {
                 _position = value;
 
+                //raise changed event
                 OnPropertyChanged("Position");
             }
         }
 
+        /// <summary>
+        /// Gets whether the system is paused or not
+        /// </summary>
+        private bool _isPaused;
+        public bool IsPaused
+        {
+            get { return _isPaused; }
+            private set
+            {
+                _isPaused = value;
+
+                //raise changed event
+                OnPropertyChanged("IsPaused");
+            }
+        }
         #endregion
 
         #region Constructor / Destructor
@@ -421,6 +433,9 @@ namespace X2MP.Core
 
             result = _channel.setPaused(!paused);
             CheckError(result);
+
+            //set IsPaused property to notify listeners
+            IsPaused = paused;
 
         }
 
