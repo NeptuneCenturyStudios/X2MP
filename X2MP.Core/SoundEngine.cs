@@ -16,6 +16,7 @@ namespace X2MP.Core
         #region Events
 
         public event PropertyChangedEventHandler PropertyChanged;
+        public event EventHandler PlaybackStatusChanged;
 
         #endregion
 
@@ -130,6 +131,11 @@ namespace X2MP.Core
                 OnPropertyChanged("IsPlaying");
             }
         }
+
+        /// <summary>
+        /// Indicates that the system is stopping
+        /// </summary>
+        private bool IsStopping { get; set; }
         #endregion
 
         #region Constructor / Destructor
@@ -256,8 +262,16 @@ namespace X2MP.Core
         /// <summary>
         /// Begins playback or pauses playback
         /// </summary>
-        public void PlayOrPause(int index)
+        /// <param name="entry">The playlist entry to play. Pass null to play from start</param>
+        public void PlayOrPause(PlayListEntry entry)
         {
+            //if we have an entry, then stop play back
+            if (entry != null && GetIsPlaying())
+            {
+                //stop playback
+                Stop();
+            }
+
             //if the track is playing, then pressing play again will pause the track
             if (GetIsPlaying())
             {
@@ -266,11 +280,8 @@ namespace X2MP.Core
             }
             else
             {
-                //set playlist index
-                PlayListIndex = index;
-
                 //nothing is playing, play something
-                Play();
+                Play(entry);
             }
         }
 
@@ -310,15 +321,31 @@ namespace X2MP.Core
         /// <summary>
         /// Begins playback. This method is called when the user initiates playback.
         /// </summary>
-        private void Play()
+        private void Play(PlayListEntry entry)
         {
 
-            //get some media to play
-            var entry = GetNextMedia();
-            _playingEntry = entry;
+            //check to see if we have a reference to the last entry
+            if (_playingEntry != null)
+            {
+                //this entry is not playing any more
+                _playingEntry.IsPlaying = false;
+            }
+
+            //if we did not pass in an entry, get one from the playlist
+            if (entry == null)
+            {
+                //get some media to play
+                entry = GetNextMedia();
+            }
+            else
+            {
+                //when we start a specific entry, we need to get the index of the entry
+                //and add 1. This ensures that the next track is picked up when GetNextMedia() is called
+                PlayListIndex = NowPlaying.IndexOf(entry) + 1;
+            }
 
             //set playing
-            IsPlaying = (_playingEntry != null);
+            IsPlaying = (entry != null);
 
             //check to see if there are
             if (entry == null)
@@ -327,10 +354,13 @@ namespace X2MP.Core
                 return;
             }
 
+            //keep a global reference to the playing entry
+            _playingEntry = entry;
+            //set playing
+            _playingEntry.IsPlaying = true;
+
             //create new cancellation token
             _playbackCts = new CancellationTokenSource();
-
-            
 
             //create a play task
             var playTask = Task.Run(() =>
@@ -338,27 +368,28 @@ namespace X2MP.Core
                 //send the media to be played
                 LoadMedia(entry);
 
-                //set playing
-                _playingEntry.IsPlaying = true;
-
-
                 //play the stream
                 PlayStream();
+
             }, _playbackCts.Token);
 
+
+            //when playback is stopped, handle what to do next
+            //either we exit and go idle, or we pick the next track.
+            //if the user selected a different entry to play, we treat it like a hard stop.
             playTask.ContinueWith((t) =>
             {
-                //this entry is not playing any more
-                _playingEntry.IsPlaying = false;
-
                 //if canceled, exit
-                if (_playbackCts.IsCancellationRequested)
+                if (IsStopping)
                 {
+                    //reset
+                    IsStopping = false;
+                    //exit
                     return;
                 }
 
                 //play the next song
-                Play();
+                Play(null);
             });
 
 
@@ -374,19 +405,6 @@ namespace X2MP.Core
             //result
             FMOD.RESULT result;
 
-            //if (_channel != null)
-            //{
-            //    //clear callback
-            //    //result = _channel.setCallback(null);
-            //    //CheckError(result);
-
-            //    //end playback
-            //    if (IsPlaying)
-            //    {
-            //        result = _channel.stop();
-            //        CheckError(result);
-            //    }
-            //}
 
             //play the sound on the channel
             result = _system.playSound(_sound, null, true, out _channel);
@@ -408,6 +426,9 @@ namespace X2MP.Core
             ////activate
             //_dsp.setBypass(false);
 
+            //fire PlaybackStatusChanged event
+            OnPlaybackStatusChanged();
+
             //hold the thread hostage
             while (GetIsPlaying())
             {
@@ -423,8 +444,6 @@ namespace X2MP.Core
 
                 //update fmod
                 Update();
-
-
 
                 //sleep for a few miliseconds
                 Thread.Sleep(25);
@@ -453,6 +472,9 @@ namespace X2MP.Core
             //set IsPaused property to notify listeners
             IsPlaying = paused;
 
+            //fire PlaybackStatusChanged event
+            OnPlaybackStatusChanged();
+
         }
 
         /// <summary>
@@ -460,11 +482,20 @@ namespace X2MP.Core
         /// </summary>
         public void Stop()
         {
+            //this entry is not playing any more
+            if (_playingEntry != null)
+            {
+                _playingEntry.IsPlaying = false;
+            }
+
+            //set the flag that we are stopping playback
+            IsStopping = true;
+
+            //set public flag to indicate we are not playing
+            IsPlaying = false;
+
             //cancel
             _playbackCts.Cancel();
-
-            //not playing now
-            IsPlaying = false;
 
             //stop playback
             if (_channel != null)
@@ -476,7 +507,8 @@ namespace X2MP.Core
                 _sound = null;
             }
 
-
+            //fire PlaybackStatusChanged event
+            OnPlaybackStatusChanged();
         }
 
 
@@ -628,7 +660,7 @@ namespace X2MP.Core
 
                     //reset
                     //PlayListIndex = 0;
-                                       
+
                 }
 
                 //return the entry we got
@@ -676,15 +708,19 @@ namespace X2MP.Core
             }
         }
 
-        //protected void OnNeedNextMedia(NeedNextMediaEventArgs e)
-        //{
-        //    //fire event
-        //    var handler = NeedNextMedia;
-        //    if (handler != null)
-        //    {
-        //        handler(this, e);
-        //    }
-        //}
+        /// <summary>
+        /// Fires the OnPlaybackStatusChanged event
+        /// </summary>
+        protected void OnPlaybackStatusChanged()
+        {
+            //fire event
+            var handler = PlaybackStatusChanged;
+            if (handler != null)
+            {
+                handler(this, EventArgs.Empty);
+            }
+        }
+
 
         #endregion
 

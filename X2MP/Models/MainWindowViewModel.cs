@@ -34,7 +34,7 @@ namespace X2MP.Models
         /// Reference to main window for this view model
         /// </summary>
         public MainWindow Window { get; private set; }
-                
+
         /// <summary>
         /// Gets the current visible component e.g. Now Playing
         /// </summary>
@@ -110,7 +110,7 @@ namespace X2MP.Models
         public MainWindowViewModel(MainWindow window)
         {
             Window = window;
-            
+
             Component = null;
 
             //create timer. we are using timer because it performs better than a thread in
@@ -123,11 +123,8 @@ namespace X2MP.Models
             });
 
             //hook up properties
-            App.SoundEngine.PropertyChanged += (object sender, PropertyChangedEventArgs e) =>
-            {
-                //raise the event that the property has changed
-                OnPropertyChanged(e.PropertyName);
-            };
+            App.SoundEngine.PropertyChanged += SoundEngine_PropertyChanged;
+            App.SoundEngine.PlaybackStatusChanged += SoundEngine_PlaybackStatusChanged;
 
             //create commands
             RegisterCommands();
@@ -136,6 +133,8 @@ namespace X2MP.Models
 
 
         }
+
+        
 
         #endregion
 
@@ -160,18 +159,7 @@ namespace X2MP.Models
             Play = new Command((parameter) =>
             {
                 //play or pause the song
-                App.SoundEngine.PlayOrPause(Convert.ToInt32(parameter));
-
-                if (!IsPlaying)
-                {
-                    //stop the timer
-                    _visTimer.Stop();
-                }
-                else if (!_visTimer.IsEnabled)
-                {
-                    //start it
-                    _visTimer.Start();
-                }
+                App.SoundEngine.PlayOrPause(null);
 
             });
 
@@ -222,6 +210,41 @@ namespace X2MP.Models
                 VisualizationUpdated(this, e);
             }
         }
+        #endregion
+
+        #region Events
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void SoundEngine_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            //raise the event that the property has changed
+            OnPropertyChanged(e.PropertyName);
+        }
+
+        /// <summary>
+        /// Handles when the play back status changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void SoundEngine_PlaybackStatusChanged(object sender, EventArgs e)
+        {
+            if (!IsPlaying)
+            {
+                //stop the timer
+                _visTimer.Stop();
+            }
+            else if (!_visTimer.IsEnabled)
+            {
+                //start it
+                _visTimer.Start();
+            }
+
+        }
+
         #endregion
     }
 }

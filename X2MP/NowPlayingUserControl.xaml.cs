@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using X2MP.Core;
 using X2MP.Models;
 
 namespace X2MP
@@ -43,6 +44,15 @@ namespace X2MP
         {
             e.Effects = DragDropEffects.Move;
 
+        }
+
+        protected void Grid_DoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            //get the playlist item
+            var entry = ((ListViewItem)sender).Content as PlayListEntry;
+
+            //play the song
+            App.SoundEngine.PlayOrPause(entry);
         }
     }
 }

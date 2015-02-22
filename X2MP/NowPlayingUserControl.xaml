@@ -30,8 +30,13 @@
         <TextBlock Grid.Row="0" Text="Drop files here or add them from your collection" 
                    Style="{StaticResource MediumText}" Foreground="Gray" HorizontalAlignment="Center" />
 
-        <ListView x:Name="NowPlayingListView" Grid.Row="1" ItemsSource="{ Binding NowPlaying }" Opacity="0.75">
-
+        <ListView x:Name="NowPlayingListView" Grid.Row="1" ItemsSource="{ Binding NowPlaying }" Opacity="0.75"
+                 >
+            <ListView.Resources>
+                <Style TargetType="ListViewItem">
+                    <EventSetter Event="MouseDoubleClick" Handler="Grid_DoubleClick" />
+                </Style>
+            </ListView.Resources>
 
             <ListView.View>
                 <GridView>
