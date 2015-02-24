@@ -59,6 +59,16 @@ namespace X2MP.Core
         }
 
         /// <summary>
+        /// Stores a history of what songs have been played automatically
+        /// </summary>
+        private List<PlayListEntry> History { get; set; }
+
+        /// <summary>
+        /// A pointer to the current position in the history buffer
+        /// </summary>
+        private int HistoryPointer { get; set; }
+
+        /// <summary>
         /// Gets the current wave data frame from the DSP unit
         /// </summary>
         public float[] WaveData { get { return _sampleBuffer; } }
@@ -147,6 +157,9 @@ namespace X2MP.Core
         {
             //initialize the playlist
             NowPlaying = new PlayList();
+
+            //create history
+            History = new List<PlayListEntry>();
 
             //create cancellation token
             _playbackCts = new CancellationTokenSource();
@@ -289,7 +302,7 @@ namespace X2MP.Core
         /// Prepares media for playback
         /// </summary>
         /// <param name="filename"></param>
-        public void LoadMedia(PlayListEntry entry)
+        private void LoadMedia(PlayListEntry entry)
         {
             FMOD.RESULT result;
 
@@ -480,12 +493,13 @@ namespace X2MP.Core
         /// <summary>
         /// Stops playback
         /// </summary>
-        public void Stop()
+        public void Stop(bool resetHistory = true)
         {
             //this entry is not playing any more
             if (_playingEntry != null)
             {
                 _playingEntry.IsPlaying = false;
+
             }
 
             //set the flag that we are stopping playback
@@ -507,11 +521,17 @@ namespace X2MP.Core
                 _sound = null;
             }
 
+            //clear history
+            if (resetHistory)
+            {
+                History.Clear();
+                HistoryPointer = 0;
+                PlayListIndex = 0;
+            }
+
             //fire PlaybackStatusChanged event
             OnPlaybackStatusChanged();
         }
-
-
 
         #endregion
 
@@ -652,15 +672,39 @@ namespace X2MP.Core
         {
             if (NowPlaying.Count > 0 && PlayListIndex < NowPlaying.Count)
             {
-                //get the playlist entry from the current index
-                var entry = NowPlaying[PlayListIndex++];
+                PlayListEntry entry = null;
 
-                if (PlayListIndex > NowPlaying.Count - 1)
+                if (HistoryPointer < History.Count - 1)
                 {
+                    ////check
+                    //if (++HistoryPointer > History.Count - 1)
+                    //{
+                    //    HistoryPointer = History.Count - 1;
+                    //}
+                    //get the playlist entry from the current index
+                    entry = History[HistoryPointer];
 
-                    //reset
-                    //PlayListIndex = 0;
+                    //increase the history pointer
+                    HistoryPointer = History.IndexOf(entry) + 1;
+                }
+                else
+                {
+                    //get the playlist entry from the current index
+                    entry = NowPlaying[PlayListIndex++];
 
+                    if (PlayListIndex > NowPlaying.Count - 1)
+                    {
+
+                        //reset
+                        //PlayListIndex = 0;
+
+                    }
+
+                    //push entry into the history
+                    History.Add(entry);
+
+                    //increase the history pointer
+                    HistoryPointer = History.IndexOf(entry);
                 }
 
                 //return the entry we got
@@ -670,6 +714,39 @@ namespace X2MP.Core
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Plays the previous song in the history
+        /// </summary>
+        public void PlayPrev()
+        {
+            //check
+            if (--HistoryPointer < 0)
+            {
+                HistoryPointer = 0;
+            }
+
+            //grab the last entry in the list
+            var entry = History[HistoryPointer];
+
+            //Stop
+            Stop(false);
+
+            //play the entry
+            Play(entry);
+        }
+
+        /// <summary>
+        /// Plays the next song in the list
+        /// </summary>
+        public void PlayNext()
+        {
+            //stop playback
+            Stop(false);
+
+            //Play the next song in the list
+            Play(null);
         }
 
         #endregion

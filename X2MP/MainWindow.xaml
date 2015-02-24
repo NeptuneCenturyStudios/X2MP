@@ -79,7 +79,8 @@
                             Maximum="{Binding Length}" Value="{Binding Position, Mode=TwoWay, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True}" />
 
                     <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
-                        <Button Style="{StaticResource ControlButton}" >
+                        <Button Style="{StaticResource ControlButton}"
+                                Command="{Binding Prev}">
                             <Image Source="/Resources/prev.png"/>
                         </Button>
                         <Button Style="{StaticResource ControlButton}"
@@ -109,7 +110,8 @@
                             </Image>
                             
                         </Button>
-                        <Button Style="{StaticResource ControlButton}" >
+                        <Button Style="{StaticResource ControlButton}"
+                                Command="{Binding Next}">
                             <Image Source="/Resources/next.png"/>
                         </Button>
 

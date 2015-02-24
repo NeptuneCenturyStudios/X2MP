@@ -103,6 +103,16 @@ namespace X2MP.Models
         /// </summary>
         public ICommand Stop { get; private set; }
 
+        /// <summary>
+        /// Go back in history
+        /// </summary>
+        public ICommand Prev { get; private set; }
+
+        /// <summary>
+        /// Go forward in history or get a new song
+        /// </summary>
+        public ICommand Next { get; private set; }
+
         #endregion
 
         #region Constructor
@@ -170,6 +180,18 @@ namespace X2MP.Models
                 _visTimer.Stop();
 
                 App.SoundEngine.Stop();
+            });
+
+            //prev
+            Prev = new Command((parameter) =>
+            {
+                App.SoundEngine.PlayPrev();
+            });
+
+            //next
+            Next = new Command((parameter) =>
+            {
+                App.SoundEngine.PlayNext();
             });
 
         }
