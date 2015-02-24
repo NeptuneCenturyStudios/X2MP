@@ -634,14 +634,7 @@ namespace X2MP.Core
         {
             //add media entry to the now playing playlist
             NowPlaying.Add(entry);
-
-            //if we are currently playing, we need to add this to the internal
-            //playlist as well
-            if (GetIsPlaying())
-            {
-                //add to internal playlist
-                //InternalPlayList.Add(entry);
-            }
+                        
         }
 
         /// <summary>
@@ -652,16 +645,7 @@ namespace X2MP.Core
         {
             //remove
             NowPlaying.Remove(entry);
-
-            //if we are currently playing, we need to add this to the internal
-            //playlist as well
-            if (GetIsPlaying())
-            {
-                //add to internal playlist
-                //InternalPlayList.Remove(entry);
-
-                //stop playback if this is the entry we are currently playing
-            }
+                        
         }
 
         /// <summary>
