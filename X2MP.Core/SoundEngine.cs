@@ -54,6 +54,18 @@ namespace X2MP.Core
             }
             set
             {
+                //check
+                if (value > NowPlaying.Count - 1)
+                {
+                    value = NowPlaying.Count - 1;
+                }
+
+                if (value < -1)
+                {
+                    value = -1;
+                }
+
+                //set index
                 _playListIndex = value;
             }
         }
@@ -157,6 +169,7 @@ namespace X2MP.Core
         {
             //initialize the playlist
             NowPlaying = new PlayList();
+            PlayListIndex = -1;
 
             //create history
             History = new List<PlayListEntry>();
@@ -334,7 +347,7 @@ namespace X2MP.Core
         /// <summary>
         /// Begins playback. This method is called when the user initiates playback.
         /// </summary>
-        private void Play(PlayListEntry entry)
+        private void Play(PlayListEntry entry = null, bool fromHistory = false)
         {
 
             //check to see if we have a reference to the last entry
@@ -350,11 +363,11 @@ namespace X2MP.Core
                 //get some media to play
                 entry = GetNextMedia();
             }
-            else
+            else if (entry != null && !fromHistory)
             {
-                //when we start a specific entry, we need to get the index of the entry
-                //and add 1. This ensures that the next track is picked up when GetNextMedia() is called
-                PlayListIndex = NowPlaying.IndexOf(entry) + 1;
+                //set playlist index to the index of the entry we are playing
+                PlayListIndex = NowPlaying.IndexOf(entry);
+
             }
 
             //set playing
@@ -402,7 +415,7 @@ namespace X2MP.Core
                 }
 
                 //play the next song
-                Play(null);
+                Play();
             });
 
 
@@ -526,7 +539,7 @@ namespace X2MP.Core
             {
                 History.Clear();
                 HistoryPointer = 0;
-                PlayListIndex = 0;
+                PlayListIndex = -1;
             }
 
             //fire PlaybackStatusChanged event
@@ -634,7 +647,7 @@ namespace X2MP.Core
         {
             //add media entry to the now playing playlist
             NowPlaying.Add(entry);
-                        
+
         }
 
         /// <summary>
@@ -645,7 +658,7 @@ namespace X2MP.Core
         {
             //remove
             NowPlaying.Remove(entry);
-                        
+
         }
 
         /// <summary>
@@ -654,35 +667,26 @@ namespace X2MP.Core
         /// <returns></returns>
         private PlayListEntry GetNextMedia()
         {
-            if (NowPlaying.Count > 0 && PlayListIndex < NowPlaying.Count)
+            if (NowPlaying.Count > 0 && PlayListIndex + 1 < NowPlaying.Count)
             {
                 PlayListEntry entry = null;
 
                 if (HistoryPointer < History.Count - 1)
                 {
-                    ////check
-                    //if (++HistoryPointer > History.Count - 1)
-                    //{
-                    //    HistoryPointer = History.Count - 1;
-                    //}
+                    //increase the history pointer
+                    HistoryPointer++;
+
                     //get the playlist entry from the current index
                     entry = History[HistoryPointer];
 
-                    //increase the history pointer
-                    HistoryPointer = History.IndexOf(entry) + 1;
                 }
                 else
                 {
+                    //set next position
+                    PlayListIndex++;
+
                     //get the playlist entry from the current index
-                    entry = NowPlaying[PlayListIndex++];
-
-                    if (PlayListIndex > NowPlaying.Count - 1)
-                    {
-
-                        //reset
-                        //PlayListIndex = 0;
-
-                    }
+                    entry = NowPlaying[PlayListIndex];
 
                     //push entry into the history
                     History.Add(entry);
@@ -711,14 +715,19 @@ namespace X2MP.Core
                 HistoryPointer = 0;
             }
 
-            //grab the last entry in the list
-            var entry = History[HistoryPointer];
+            if (HistoryPointer < History.Count)
+            {
+                //grab the last entry in the list
+                var entry = History[HistoryPointer];
 
-            //Stop
-            Stop(false);
+                //Stop
+                Stop(false);
 
-            //play the entry
-            Play(entry);
+                //play the entry
+                Play(entry, true);
+            }
+
+            
         }
 
         /// <summary>
@@ -730,7 +739,7 @@ namespace X2MP.Core
             Stop(false);
 
             //Play the next song in the list
-            Play(null);
+            Play();
         }
 
         #endregion
