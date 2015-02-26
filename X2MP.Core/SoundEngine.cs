@@ -306,6 +306,46 @@ namespace X2MP.Core
             }
             else
             {
+
+                if (entry != null)
+                {
+
+                    //set playlist index to playing entry
+                    PlayListIndex = NowPlaying.IndexOf(entry);
+
+                    //add the entry to the history
+                    AddToHistory(entry);
+                }
+
+                //run playback
+                Run(entry);
+            }
+        }
+
+        /// <summary>
+        /// Run playback
+        /// </summary>
+        /// <param name="entry"></param>
+        private void Run(PlayListEntry entry = null)
+        {
+            //check to see if we have a reference to the last entry
+            if (_playingEntry != null)
+            {
+                //this entry is not playing any more
+                _playingEntry.IsPlaying = false;
+            }
+
+            //get next media if entry is null
+            entry = entry ?? GetNextMedia();
+
+            if (entry != null)
+            {
+                //keep a global reference to the playing entry
+                _playingEntry = entry;
+
+                //set is playing on the entry
+                entry.IsPlaying = true;
+
                 //nothing is playing, play something
                 Play(entry);
             }
@@ -347,44 +387,17 @@ namespace X2MP.Core
         /// <summary>
         /// Begins playback. This method is called when the user initiates playback.
         /// </summary>
-        private void Play(PlayListEntry entry = null, bool fromHistory = false)
+        private void Play(PlayListEntry entry)
         {
-
-            //check to see if we have a reference to the last entry
-            if (_playingEntry != null)
-            {
-                //this entry is not playing any more
-                _playingEntry.IsPlaying = false;
-            }
-
-            //if we did not pass in an entry, get one from the playlist
             if (entry == null)
             {
-                //get some media to play
-                entry = GetNextMedia();
-            }
-            else if (entry != null && !fromHistory)
-            {
-                //set playlist index to the index of the entry we are playing
-                PlayListIndex = NowPlaying.IndexOf(entry);
-
+                //throw an error
+                throw new ArgumentNullException("entry");
             }
 
             //set playing
-            IsPlaying = (entry != null);
-
-            //check to see if there are
-            if (entry == null)
-            {
-                //nothing, so, return
-                return;
-            }
-
-            //keep a global reference to the playing entry
-            _playingEntry = entry;
-            //set playing
-            _playingEntry.IsPlaying = true;
-
+            IsPlaying = true;
+            
             //create new cancellation token
             _playbackCts = new CancellationTokenSource();
 
@@ -394,7 +407,7 @@ namespace X2MP.Core
                 //send the media to be played
                 LoadMedia(entry);
 
-                //play the stream
+                //play the stream. holds thread hostage until playback stops
                 PlayStream();
 
             }, _playbackCts.Token);
@@ -415,7 +428,7 @@ namespace X2MP.Core
                 }
 
                 //play the next song
-                Play();
+                Run();
             });
 
 
@@ -662,6 +675,19 @@ namespace X2MP.Core
         }
 
         /// <summary>
+        /// Adds an entry to the history
+        /// </summary>
+        /// <param name="entry"></param>
+        private void AddToHistory(PlayListEntry entry)
+        {
+            //push entry into the history
+            History.Add(entry);
+
+            //increase the history pointer
+            HistoryPointer = History.IndexOf(entry);
+        }
+
+        /// <summary>
         /// Gets the next media in the list
         /// </summary>
         /// <returns></returns>
@@ -688,11 +714,8 @@ namespace X2MP.Core
                     //get the playlist entry from the current index
                     entry = NowPlaying[PlayListIndex];
 
-                    //push entry into the history
-                    History.Add(entry);
-
-                    //increase the history pointer
-                    HistoryPointer = History.IndexOf(entry);
+                    //add to history
+                    AddToHistory(entry);
                 }
 
                 //return the entry we got
@@ -724,7 +747,7 @@ namespace X2MP.Core
                 Stop(false);
 
                 //play the entry
-                Play(entry, true);
+                Run(entry);
             }
 
             
@@ -739,7 +762,7 @@ namespace X2MP.Core
             Stop(false);
 
             //Play the next song in the list
-            Play();
+            Run();
         }
 
         #endregion
