@@ -35,8 +35,10 @@ namespace X2MP
             //get the model
             var model = this.DataContext as NowPlayingViewModel;
 
-            //handle with model
-            model.Drop(sender, e);
+            Task.Run(() => {
+                //handle with model
+                model.Drop(sender, e);
+            });
 
         }
 

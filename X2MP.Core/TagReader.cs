@@ -67,23 +67,31 @@ namespace X2MP.Core
         /// <param name="filename"></param>
         public TagInfo ReadTags(string filename)
         {
-            //if ok, create a sound with tag support
-            FMOD.RESULT result;
-            FMOD.Sound snd;
-            //open the sound for tag reading
-            result = _system.createStream(filename, FMOD.MODE.OPENONLY, out snd);
-            CheckError(result);
+            try
+            {
+                //if ok, create a sound with tag support
+                FMOD.RESULT result;
+                FMOD.Sound snd;
+                //open the sound for tag reading
+                result = _system.createStream(filename, FMOD.MODE.OPENONLY, out snd);
+                CheckError(result);
 
-            //if ok, get the number of tags in the fie
-            int numTags;
-            int numTagsUpdated;
+                //if ok, get the number of tags in the fie
+                int numTags;
+                int numTagsUpdated;
 
-            //get num tags
-            result = snd.getNumTags(out numTags, out numTagsUpdated);
-            CheckError(result);
-            //if ok, and we have some tags, then
+                //get num tags
+                result = snd.getNumTags(out numTags, out numTagsUpdated);
+                CheckError(result);
+                //if ok, and we have some tags, then
 
-            return ReadTags(snd, numTags);
+                return ReadTags(snd, numTags);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
         }
 
         /// <summary>
