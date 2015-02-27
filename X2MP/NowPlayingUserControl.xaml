@@ -7,7 +7,7 @@
              d:DesignHeight="300" d:DesignWidth="300">
 
     <UserControl.Resources>
-        <Style TargetType="StackPanel" x:Key="StackPanelVisibilityStyle">
+        <Style TargetType="Button" x:Key="ControlButtonEnabledStyle">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Path=SelectedItem, ElementName=NowPlayingListView}" Value="{x:Null}">
                     <Setter Property="Visibility" Value="Collapsed" />
@@ -30,8 +30,11 @@
         <TextBlock Grid.Row="0" Text="Drop files here or add them from your collection" 
                    Style="{StaticResource MediumText}" Foreground="Gray" HorizontalAlignment="Center" />
 
-        <ListView x:Name="NowPlayingListView" Grid.Row="1" ItemsSource="{ Binding NowPlaying }" Opacity="0.75"
-                 >
+        <ListView x:Name="NowPlayingListView" Grid.Row="1" 
+                  ItemsSource="{ Binding NowPlaying }"
+                  SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                  Opacity="0.75"
+                  VirtualizingPanel.VirtualizationMode="Recycling">
             <ListView.Resources>
                 <Style TargetType="ListViewItem">
                     <EventSetter Event="MouseDoubleClick" Handler="Grid_DoubleClick" />
@@ -67,11 +70,17 @@
             </ListView.View>
 
         </ListView>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" Style="{DynamicResource ResourceKey=StackPanelVisibilityStyle}">
+        <StackPanel Grid.Row="2" Orientation="Horizontal" >
+            <Button Style="{StaticResource ControlButton}"
+                    Command="{Binding ClearNowPlaying}"
+                    ToolTip="Clear the entire Now Playing queue">
+                <Image Source="/Resources/trash.png" Stretch="None"/>
+            </Button>
             <Button Style="{StaticResource ControlButton}"
                     Command="{Binding DeleteItem}"
                     CommandParameter="{Binding SelectedItem, ElementName=NowPlayingListView}"
                     ToolTip="Remove item from Now Playing">
+                
                 <Image Source="/Resources/delete.png"/>
             </Button>
         </StackPanel>

@@ -8,7 +8,7 @@
         <Style TargetType="Window" x:Key="WindowStyle">
             <Setter Property="AllowsTransparency" Value="true" />
             <Setter Property="WindowStyle" Value="None" />
-            <Setter Property="Background" Value="White" />
+            <Setter Property="Background" Value="Transparent" />
         </Style>
 
         <Style TargetType="Button" x:Key="ImageButton">
@@ -58,6 +58,7 @@
                                             RelativeSource={RelativeSource Mode=FindAncestor, 
                                                 AncestorType={x:Type Button }}}"
                                 >
+
                             <Border.Style>
                                 <Style>
                                     <Setter Property="Border.Background" Value="Transparent"/>
@@ -65,18 +66,31 @@
                                         <Trigger Property="Border.IsMouseOver" Value="True">
                                             <Setter Property="Border.Background" Value="LightGray" />
                                         </Trigger>
+
+                                        <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType={x:Type Button}} }" Value="False">
+                                            <Setter Property="Border.Background" Value="LightGray" />
+                                        </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </Border.Style>
+
                             <Grid>
+
                                 <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
+                                                  VerticalAlignment="Center"/>
                             </Grid>
                         </Border>
                     </ControlTemplate>
 
                 </Setter.Value>
             </Setter>
+            <Style.Triggers>
+
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.25" />
+                </Trigger>
+
+            </Style.Triggers>
         </Style>
 
         <!--text styles-->

@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:X2MP"
         Title="X2 Media Player"
-        Height="400"
+        Height="450"
         Width="650" 
         ResizeMode="CanResizeWithGrip"
         MinWidth="325"
@@ -11,10 +11,13 @@
         Style="{StaticResource WindowStyle}"
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
         >
-
+    <Window.Effect>
+        <DropShadowEffect BlurRadius="25" ShadowDepth="0" />
+    </Window.Effect>
     <!--main border around window-->
-    <Border BorderThickness="1" BorderBrush="CornflowerBlue">
-
+    <Border BorderThickness="1" BorderBrush="CornflowerBlue" Margin="30"
+            Background="White">
+        
         <Grid>
 
             <!--define a section for our controls which will always be visible-->
@@ -66,8 +69,8 @@
             </Grid>
 
             <!--controls-->
-            <Grid Grid.Row="2" Margin="10">
-                <Grid>
+            <Grid Grid.Row="2" Background="AliceBlue">
+                <Grid Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>

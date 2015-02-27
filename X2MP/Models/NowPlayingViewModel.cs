@@ -30,11 +30,29 @@ namespace X2MP.Models
             }
         }
 
+        /// <summary>
+        /// Gets or sets the selected playlist item
+        /// </summary>
+        private PlayListEntry _selectedItem;
+        public PlayListEntry SelectedItem
+        {
+            get { return _selectedItem; }
+            set
+            {
+                _selectedItem = value;
+
+                //fire changed event
+                OnPropertyChanged("SelectedItem");
+                //affects commands
+                DeleteItem.OnCanExecuteChanged();
+            }
+        }
+
         #region Commands
         /// <summary>
         /// Gets the command for the now playing button
         /// </summary>
-        public ICommand DeleteItem { get; private set; }
+        public Command DeleteItem { get; private set; }
         #endregion
 
         #endregion
@@ -63,11 +81,12 @@ namespace X2MP.Models
                 //create playlist entry
                 var playlistEntry = new PlayListEntry() { TagInfo = tagInfo, FileName = file };
 
-                System.Windows.Application.Current.Dispatcher.Invoke(() => {
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
                     //add to now playing
                     App.SoundEngine.AddToNowPlaying(playlistEntry);
                 });
-                
+
 
             }
         }
@@ -131,7 +150,12 @@ namespace X2MP.Models
             DeleteItem = new Command((parameter) =>
             {
                 DeleteEntry((PlayListEntry)parameter);
-            });
+            },
+            (parameter) =>
+            {
+                return SelectedItem != null;
+            }
+            );
         }
         #endregion
 

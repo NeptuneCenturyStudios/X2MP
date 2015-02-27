@@ -9,6 +9,8 @@ namespace X2MP.Models
 {
     class Command : ICommand
     {
+        public event EventHandler CanExecuteChanged;
+
         private Action<object> _execute;
         private Func<object, bool> _canExecute;
 
@@ -36,8 +38,6 @@ namespace X2MP.Models
             _canExecute = (parameter) => { return true; };
         }
 
-        public event EventHandler CanExecuteChanged;
-
         public bool CanExecute(object parameter)
         {
             return _canExecute.Invoke(parameter);
@@ -46,6 +46,18 @@ namespace X2MP.Models
         public void Execute(object parameter)
         {
             _execute.Invoke(parameter);
+        }
+
+        /// <summary>
+        /// Raises the CanExecuteChanged event
+        /// </summary>
+        public void OnCanExecuteChanged()
+        {
+            var handle = CanExecuteChanged;
+            if (handle != null)
+            {
+                CanExecuteChanged(this, EventArgs.Empty);
+            }
         }
     }
 }
