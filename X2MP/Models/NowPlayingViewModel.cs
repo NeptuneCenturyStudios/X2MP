@@ -53,6 +53,11 @@ namespace X2MP.Models
         /// Gets the command for the now playing button
         /// </summary>
         public Command DeleteItem { get; private set; }
+
+        /// <summary>
+        /// Clear the now playing list
+        /// </summary>
+        public Command ClearNowPlaying { get; private set; }
         #endregion
 
         #endregion
@@ -137,10 +142,7 @@ namespace X2MP.Models
             }
         }
 
-        public void DeleteEntry(PlayListEntry entry)
-        {
-            App.SoundEngine.RemoveFromNowPlaying(entry);
-        }
+        
         #endregion
 
         #region Register Commands
@@ -149,13 +151,21 @@ namespace X2MP.Models
             //delete a playlist item
             DeleteItem = new Command((parameter) =>
             {
-                DeleteEntry((PlayListEntry)parameter);
+                //remove item
+                App.SoundEngine.RemoveFromNowPlaying(SelectedItem);
             },
             (parameter) =>
             {
                 return SelectedItem != null;
             }
             );
+
+            //clear
+            ClearNowPlaying = new Command((parameter) =>
+            {
+                //clear
+                App.SoundEngine.ClearNowPlaying();
+            });
         }
         #endregion
 

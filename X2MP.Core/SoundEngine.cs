@@ -672,6 +672,23 @@ namespace X2MP.Core
             //remove
             NowPlaying.Remove(entry);
 
+            if (entry == _playingEntry)
+            {
+                //stop playing
+                Stop();
+            }
+
+        }
+
+        /// <summary>
+        /// Clear the now playing list
+        /// </summary>
+        public void ClearNowPlaying()
+        {
+            NowPlaying.Clear();
+
+            //stop playback
+            Stop();
         }
 
         /// <summary>

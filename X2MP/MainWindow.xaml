@@ -17,7 +17,7 @@
     <!--main border around window-->
     <Border BorderThickness="1" BorderBrush="CornflowerBlue" Margin="30"
             Background="White">
-        
+
         <Grid>
 
             <!--define a section for our controls which will always be visible-->
@@ -48,15 +48,15 @@
 
             <!--grid for everything else-->
             <Grid Grid.Row="1" >
-                
+
                 <!--<Image x:Name="vis" Width="648" Height="270" >
                     
                 </Image>-->
                 <!--<c:RenderCanvas x:Name="vis"></c:RenderCanvas>-->
                 <Canvas x:Name="vis" >
-                    
+
                     <Image x:Name="vimg"/>
-                    
+
                 </Canvas>
                 <!--<WindowsFormsHost Grid.ColumnSpan="2" >
                     <local:Visualizer x:Name="vis" Width="500" Height="270" />
@@ -81,44 +81,67 @@
                             Thumb.DragCompleted="Slider_DragCompleted"
                             Maximum="{Binding Length}" Value="{Binding Position, Mode=TwoWay, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True}" />
 
-                    <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
-                        <Button Style="{StaticResource ControlButton}"
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" VerticalAlignment="Center" FontSize="20" Foreground="Gray"
+                                   >
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0:D2}:{1:D2}:{2:D2}">
+                                    <Binding Path="CurrentTime.Hours"/>
+                                    <Binding Path="CurrentTime.Minutes"/>
+                                    <Binding Path="CurrentTime.Seconds"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
+
+                        </TextBlock>
+
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" >
+
+                            <Button Style="{StaticResource ControlButton}"
                                 Command="{Binding Prev}">
-                            <Image Source="/Resources/prev.png"/>
-                        </Button>
-                        <Button Style="{StaticResource ControlButton}"
+                                <Image Source="/Resources/prev.png"/>
+                            </Button>
+                            <Button Style="{StaticResource ControlButton}"
                                 Command="{Binding Stop}">
-                            <Image Source="/Resources/stop.png"/>
-                        </Button>
-                        <Button Style="{StaticResource ControlButton}"
+                                <Image Source="/Resources/stop.png"/>
+                            </Button>
+                            <Button Style="{StaticResource ControlButton}"
                                 Width="48"
                                 Height="48"
                                 Command="{Binding Play}"
                                 CommandParameter="0">
-                            
-                            <!--pause or play image, depending on player status-->
-                            <Image >
-                                <Image.Resources>
-                                    <Style TargetType="Image">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsPlaying}" Value="false">
-                                                <Setter Property="Source" Value="/Resources/play.png"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding IsPlaying}" Value="true">
-                                                <Setter Property="Source" Value="/Resources/pause.png"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Image.Resources>
-                            </Image>
-                            
-                        </Button>
-                        <Button Style="{StaticResource ControlButton}"
-                                Command="{Binding Next}">
-                            <Image Source="/Resources/next.png"/>
-                        </Button>
 
-                    </StackPanel>
+                                <!--pause or play image, depending on player status-->
+                                <Image >
+                                    <Image.Resources>
+                                        <Style TargetType="Image">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsPlaying}" Value="false">
+                                                    <Setter Property="Source" Value="/Resources/play.png"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsPlaying}" Value="true">
+                                                    <Setter Property="Source" Value="/Resources/pause.png"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Image.Resources>
+                                </Image>
+
+                            </Button>
+                            <Button Style="{StaticResource ControlButton}"
+                                Command="{Binding Next}">
+                                <Image Source="/Resources/next.png"/>
+                            </Button>
+
+                        </StackPanel>
+                    </Grid>
+
+
+
 
                 </Grid>
 

@@ -67,7 +67,17 @@ namespace X2MP.Models
         /// </summary>
         public uint Position
         {
-            get { return App.SoundEngine.Position; }
+            get
+            {
+                //get time
+                var pos = App.SoundEngine.Position;
+
+                //create a time span object
+                CurrentTime = TimeSpan.FromMilliseconds(pos);
+
+                //return time
+                return pos;
+            }
             set { App.SoundEngine.Position = value; }
         }
 
@@ -79,6 +89,18 @@ namespace X2MP.Models
             get { return App.SoundEngine.IsPlaying; }
         }
 
+        private TimeSpan _currentTime;
+        public TimeSpan CurrentTime
+        {
+            get { return _currentTime; }
+            private set
+            {
+                _currentTime = value;
+
+                //raise changed event
+                OnPropertyChanged("CurrentTime");
+            }
+        }
         #endregion
 
         #region Commands
@@ -144,7 +166,7 @@ namespace X2MP.Models
 
         }
 
-        
+
 
         #endregion
 
