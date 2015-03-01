@@ -80,8 +80,8 @@
                     Command="{Binding DeleteItem}"
                     CommandParameter="{Binding SelectedItem, ElementName=NowPlayingListView}"
                     ToolTip="Remove item from Now Playing">
-                
-                <Image Source="/Resources/delete.png"/>
+
+                <Image Source="/Resources/delete.png" Stretch="None"/>
             </Button>
         </StackPanel>
 

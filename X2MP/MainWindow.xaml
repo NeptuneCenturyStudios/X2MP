@@ -76,19 +76,21 @@
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
 
+                    <!--time slider-->
                     <Slider HorizontalAlignment="Stretch" Grid.Row="0" LargeChange="5000" SmallChange="1000"
                             Thumb.DragStarted="Slider_DragStarted"
                             Thumb.DragCompleted="Slider_DragCompleted"
                             Maximum="{Binding Length}" Value="{Binding Position, Mode=TwoWay, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True}" />
 
+                    <!--control area-->
                     <Grid Grid.Row="1">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="150"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Column="0" VerticalAlignment="Center" FontSize="20" Foreground="Gray"
-                                   >
+                        <!--time counter-->
+                        <TextBlock Grid.Column="0" VerticalAlignment="Center" FontSize="20" Foreground="Gray">
                             <TextBlock.Text>
                                 <MultiBinding StringFormat="{}{0:D2}:{1:D2}:{2:D2}">
                                     <Binding Path="CurrentTime.Hours"/>
@@ -99,24 +101,30 @@
 
                         </TextBlock>
 
+                        <!--control buttons-->
                         <StackPanel Grid.Column="1" Orientation="Horizontal" >
 
-                            <Button Style="{StaticResource ControlButton}"
-                                Command="{Binding Prev}">
-                                <Image Source="/Resources/prev.png"/>
-                            </Button>
+                            <!--stop-->
                             <Button Style="{StaticResource ControlButton}"
                                 Command="{Binding Stop}">
-                                <Image Source="/Resources/stop.png"/>
+                                <Image Source="/Resources/stop.png" Stretch="None"/>
                             </Button>
+                            
+                            <!--previous-->
                             <Button Style="{StaticResource ControlButton}"
-                                Width="48"
-                                Height="48"
+                                Command="{Binding Prev}">
+                                <Image Source="/Resources/prev.png" Stretch="None"/>
+                            </Button>
+                            
+                            <!--play / pause-->
+                            <Button Style="{StaticResource ControlButton}"
+                                Width="52"
+                                Height="52"
                                 Command="{Binding Play}"
                                 CommandParameter="0">
 
                                 <!--pause or play image, depending on player status-->
-                                <Image >
+                                <Image Stretch="None" >
                                     <Image.Resources>
                                         <Style TargetType="Image">
                                             <Style.Triggers>
@@ -124,7 +132,7 @@
                                                     <Setter Property="Source" Value="/Resources/play.png"/>
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding IsPlaying}" Value="true">
-                                                    <Setter Property="Source" Value="/Resources/pause.png"/>
+                                                    <Setter Property="Source" Value="/Resources/pause.png" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -132,9 +140,11 @@
                                 </Image>
 
                             </Button>
+                            
+                            <!--next-->
                             <Button Style="{StaticResource ControlButton}"
                                 Command="{Binding Next}">
-                                <Image Source="/Resources/next.png"/>
+                                <Image Source="/Resources/next.png" Stretch="None"/>
                             </Button>
 
                         </StackPanel>
