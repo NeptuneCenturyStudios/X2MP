@@ -30,9 +30,10 @@
             <!--grid for menu items-->
             <Grid Grid.Row="0">
                 <StackPanel Orientation="Horizontal">
-                    <Button x:Name="CloseButton" Style="{StaticResource ImageButton}"
-                            HorizontalAlignment="Right"
-                            Click="CloseButton_Click">
+                    <Button x:Name="CloseButton" 
+                            Style="{StaticResource ImageButton}"
+                            Click="CloseButton_Click"
+                            ToolTip="Power down the player">
                         <Image Source="/Resources/power.png"/>
                     </Button>
                     <Button Command="{Binding OpenCollection}">
@@ -43,8 +44,10 @@
                         Now Playing
                     </Button>
 
-                    <Button Command="{Binding OpenEqualizer}">
-                        Equalizer
+                    <Button Command="{Binding OpenEqualizer}"
+                            Style="{StaticResource ImageButton}"
+                            ToolTip="Display the equalizer">
+                        <Image Source="/Resources/equalizer.png"/>
                     </Button>
                     
                 </StackPanel>

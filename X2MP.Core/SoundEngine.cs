@@ -460,7 +460,7 @@ namespace X2MP.Core
             {
                 _channel.stop();
             }
-                        
+
             //free DSP
             if (_dsp != null)
             {
@@ -618,7 +618,7 @@ namespace X2MP.Core
         /// </summary>
         private void SetupEqualizer()
         {
-            
+
             FMOD.RESULT result;
 
             foreach (var eq in EqualizerBands)
@@ -665,7 +665,10 @@ namespace X2MP.Core
         /// <param name="gain"></param>
         public void SetEqualizerBand(int index, float gain)
         {
-            SetEqualizerBand(_eq[index], gain);
+            if (index < _eq.Count && index >= 0)
+            {
+                SetEqualizerBand(_eq[index], gain);
+            }
         }
 
         private void SetEqualizerBand(FMOD.DSP eqDsp, float gain)

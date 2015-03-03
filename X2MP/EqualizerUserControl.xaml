@@ -6,8 +6,31 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid Background="White" Opacity="0.75">
+       
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
         
-        <ItemsControl ItemsSource="{Binding EqualizerBands}" >
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+
+            <Button Grid.Row="0"
+                    ToolTip="Reset equalizer to center"
+                    Style="{StaticResource ImageButton}"
+                    Command="{Binding ResetEq}">
+                <Image Source="/Resources/reset-eq.png" Stretch="None"/>
+            </Button>
+            
+            <TextBlock Grid.Row="1">Adjust</TextBlock>
+        </Grid>
+        
+        
+        <ItemsControl Grid.Column="1"
+                      ItemsSource="{Binding EqualizerBands}" >
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <!--<StackPanel Orientation="Horizontal"/>-->
@@ -36,16 +59,7 @@
         </ItemsControl>
 
 
-        <!--<Slider Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center" Minimum="-30" Maximum="30" />
-        <Slider Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Center" Minimum="-30" Maximum="30"  />
-        <Slider Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Center" Minimum="-30" Maximum="30"  />
-        <Slider Grid.Column="3" Orientation="Vertical" HorizontalAlignment="Center" Minimum="-30" Maximum="30"  />
-        <Slider Grid.Column="4" Orientation="Vertical" HorizontalAlignment="Center" Minimum="-30" Maximum="30"  />
-        <Slider Grid.Column="5" Orientation="Vertical" HorizontalAlignment="Center" Minimum="-30" Maximum="30"  />
-        <Slider Grid.Column="6" Orientation="Vertical" HorizontalAlignment="Center" Minimum="-30" Maximum="30"  />
-        <Slider Grid.Column="7" Orientation="Vertical" HorizontalAlignment="Center" Minimum="-30" Maximum="30"  />
-        <Slider Grid.Column="8" Orientation="Vertical" HorizontalAlignment="Center" Minimum="-30" Maximum="30"  />
-        <Slider Grid.Column="9" Orientation="Vertical" HorizontalAlignment="Center" Minimum="-30" Maximum="30"  />-->
+       
 
     </Grid>
 </UserControl>
