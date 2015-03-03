@@ -43,6 +43,10 @@
                         Now Playing
                     </Button>
 
+                    <Button Command="{Binding OpenEqualizer}">
+                        Equalizer
+                    </Button>
+                    
                 </StackPanel>
             </Grid>
 

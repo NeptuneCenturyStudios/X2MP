@@ -108,6 +108,11 @@ namespace X2MP.Models
         /// <summary>
         /// Gets the command for the now playing button
         /// </summary>
+        public ICommand OpenEqualizer { get; private set; }
+
+        /// <summary>
+        /// Gets the command for the now playing button
+        /// </summary>
         public ICommand OpenNowPlaying { get; private set; }
 
         /// <summary>
@@ -185,6 +190,13 @@ namespace X2MP.Models
             {
                 //display the Now Playing component
                 Component = null;
+            });
+
+            //create commands
+            OpenEqualizer = new Command((parameter) =>
+            {
+                //display the Now Playing component
+                Component = new EqualizerUserControl();
             });
 
             //play or pause

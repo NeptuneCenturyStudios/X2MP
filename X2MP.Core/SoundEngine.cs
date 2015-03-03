@@ -31,6 +31,8 @@ namespace X2MP.Core
         private FMOD.DSP_DESCRIPTION _dspDesc;      //DSP description. this is global because the GC tends to destroy the delegate for the callback, leading to exceptions
         private float[] _sampleBuffer;              //stores a copy of the current frame from the DSP unit
 
+        private List<FMOD.DSP> _eq;                 //an array of equalizer dsp units
+
         /// <summary>
         /// Cancellation token source for cancelling playback
         /// </summary>
@@ -158,6 +160,8 @@ namespace X2MP.Core
         /// Indicates that the system is stopping
         /// </summary>
         private bool IsStopping { get; set; }
+
+        public ParamEqInfo[] EqualizerBands { get; private set; }
         #endregion
 
         #region Constructor / Destructor
@@ -196,6 +200,9 @@ namespace X2MP.Core
             _dspDesc.numinputbuffers = 1;
             _dspDesc.numoutputbuffers = 1;
             _dspDesc.read = myDSPCallback;
+
+            //setup equalizer bands
+            InitializeEqualizerBands();
 
         }
 
@@ -359,7 +366,11 @@ namespace X2MP.Core
         {
             FMOD.RESULT result;
 
-            //if we are already playing, we have to stop the current media
+            //release any playing sound
+            if (_sound != null)
+            {
+                _sound.release();
+            }
 
             //load a new sound
             result = _system.createSound(entry.FileName, FMOD.MODE._2D | FMOD.MODE.NONBLOCKING | FMOD.MODE.CREATESTREAM, out _sound);
@@ -397,7 +408,7 @@ namespace X2MP.Core
 
             //set playing
             IsPlaying = true;
-            
+
             //create new cancellation token
             _playbackCts = new CancellationTokenSource();
 
@@ -444,10 +455,27 @@ namespace X2MP.Core
             //result
             FMOD.RESULT result;
 
+            //stop any playing channels
+            if (_channel != null)
+            {
+                _channel.stop();
+            }
+                        
+            //free DSP
+            if (_dsp != null)
+            {
+                _dsp.release();
+            }
+
+            //destroy the equalizer
+            DestroyEqualizer();
 
             //play the sound on the channel
             result = _system.playSound(_sound, null, true, out _channel);
             CheckError(result);
+
+            //prepare the equalizer
+            SetupEqualizer();
 
             //create the dsp, although it will not be active at this time
             result = _system.createDSP(ref _dspDesc, out _dsp);
@@ -557,6 +585,94 @@ namespace X2MP.Core
 
             //fire PlaybackStatusChanged event
             OnPlaybackStatusChanged();
+        }
+
+        #endregion
+
+        #region Equalizer
+
+        /// <summary>
+        /// Initializes the equalizer band values, center freq, bandwidth, gain, etc...
+        /// </summary>
+        private void InitializeEqualizerBands()
+        {
+            EqualizerBands = new[] { 
+                new ParamEqInfo() { Center = 31.5f    , Min=-30.0f, Max=30.0f, Gain=1.0f },
+                new ParamEqInfo() { Center = 62.5f    , Min=-30.0f, Max=30.0f, Gain=1.0f },
+                new ParamEqInfo() { Center = 125.0f   , Min=-30.0f, Max=30.0f, Gain=1.0f },
+                new ParamEqInfo() { Center = 250.0f   , Min=-30.0f, Max=30.0f, Gain=1.0f },
+                new ParamEqInfo() { Center = 500.0f   , Min=-30.0f, Max=30.0f, Gain=1.0f },
+                new ParamEqInfo() { Center = 1000.0f  , Min=-30.0f, Max=30.0f, Gain=1.0f },
+                new ParamEqInfo() { Center = 2000.0f  , Min=-30.0f, Max=30.0f, Gain=1.0f },
+                new ParamEqInfo() { Center = 4000.0f  , Min=-30.0f, Max=30.0f, Gain=1.0f },
+                new ParamEqInfo() { Center = 8000.0f  , Min=-30.0f, Max=30.0f, Gain=1.0f },
+                new ParamEqInfo() { Center = 16000.0f , Min=-30.0f, Max=30.0f, Gain=1.0f }
+            };
+
+            //create instance of list
+            _eq = new List<FMOD.DSP>();
+        }
+
+        /// <summary>
+        /// Add the DSP units to the channel
+        /// </summary>
+        private void SetupEqualizer()
+        {
+            
+            FMOD.RESULT result;
+
+            foreach (var eq in EqualizerBands)
+            {
+                FMOD.DSP eqDsp;
+
+                //create the equalizer dps effects
+                result = _system.createDSPByType(FMOD.DSP_TYPE.PARAMEQ, out eqDsp);
+
+                //set up the dsp unit
+                result = eqDsp.setParameterFloat((int)FMOD.DSP_PARAMEQ.CENTER, eq.Center);
+
+                //set the gain to the current gain
+                SetEqualizerBand(eqDsp, eq.Gain);
+
+                //prepare the equalizer on the channel
+                result = _channel.addDSP(0, eqDsp);
+
+                //add dsp to list
+                _eq.Add(eqDsp);
+            }
+
+        }
+
+        /// <summary>
+        /// Releases the DSP units that make up the equalizer
+        /// </summary>
+        private void DestroyEqualizer()
+        {
+            foreach (var eqDsp in _eq)
+            {
+                //release the dsp unit
+                eqDsp.release();
+            }
+
+            //clear dsp
+            _eq.Clear();
+        }
+
+        /// <summary>
+        /// Sets the gain of the specific equalizer band
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="gain"></param>
+        public void SetEqualizerBand(int index, float gain)
+        {
+            SetEqualizerBand(_eq[index], gain);
+        }
+
+        private void SetEqualizerBand(FMOD.DSP eqDsp, float gain)
+        {
+            FMOD.RESULT result;
+            //set the gain for the specified eq band
+            result = eqDsp.setParameterFloat((int)FMOD.DSP_PARAMEQ.GAIN, gain);
         }
 
         #endregion
@@ -767,7 +883,7 @@ namespace X2MP.Core
                 Run(entry);
             }
 
-            
+
         }
 
         /// <summary>

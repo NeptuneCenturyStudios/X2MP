@@ -44,6 +44,7 @@
     <Compile Include="FMOD\fmod.cs" />
     <Compile Include="FMOD\fmod_dsp.cs" />
     <Compile Include="FMOD\fmod_errors.cs" />
+    <Compile Include="ParamEqInfo.cs" />
     <Compile Include="PlayListEntry.cs" />
     <Compile Include="TagInfo.cs" />
     <Compile Include="TagReader.cs" />

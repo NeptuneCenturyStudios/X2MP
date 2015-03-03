@@ -1,0 +1,51 @@
+﻿<UserControl x:Class="X2MP.EqualizerUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid Background="White" Opacity="0.75">
+        
+        <ItemsControl ItemsSource="{Binding EqualizerBands}" >
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <!--<StackPanel Orientation="Horizontal"/>-->
+                    <UniformGrid Rows="1" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+
+                        <Slider Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Center" Minimum="{Binding Min}" Maximum="{Binding Max}"
+                                Value="{Binding Gain, Mode=TwoWay}" />
+
+                        <TextBlock Grid.Row="1" Text="{Binding Center, StringFormat='{}{0}hz'}" HorizontalAlignment="Center" />
+                    </Grid>
+
+
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+
+        </ItemsControl>
+
+
+        <!--<Slider Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center" Minimum="-30" Maximum="30" />
+        <Slider Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Center" Minimum="-30" Maximum="30"  />
+        <Slider Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Center" Minimum="-30" Maximum="30"  />
+        <Slider Grid.Column="3" Orientation="Vertical" HorizontalAlignment="Center" Minimum="-30" Maximum="30"  />
+        <Slider Grid.Column="4" Orientation="Vertical" HorizontalAlignment="Center" Minimum="-30" Maximum="30"  />
+        <Slider Grid.Column="5" Orientation="Vertical" HorizontalAlignment="Center" Minimum="-30" Maximum="30"  />
+        <Slider Grid.Column="6" Orientation="Vertical" HorizontalAlignment="Center" Minimum="-30" Maximum="30"  />
+        <Slider Grid.Column="7" Orientation="Vertical" HorizontalAlignment="Center" Minimum="-30" Maximum="30"  />
+        <Slider Grid.Column="8" Orientation="Vertical" HorizontalAlignment="Center" Minimum="-30" Maximum="30"  />
+        <Slider Grid.Column="9" Orientation="Vertical" HorizontalAlignment="Center" Minimum="-30" Maximum="30"  />-->
+
+    </Grid>
+</UserControl>
