@@ -84,10 +84,13 @@
                     </Grid.RowDefinitions>
 
                     <!--time slider-->
-                    <Slider HorizontalAlignment="Stretch" Grid.Row="0" LargeChange="5000" SmallChange="1000"
+                    <Slider Grid.Row="0"
+                            LargeChange="5000"
+                            SmallChange="1000"
                             Thumb.DragStarted="Slider_DragStarted"
                             Thumb.DragCompleted="Slider_DragCompleted"
-                            Maximum="{Binding Length}" Value="{Binding Position, Mode=TwoWay, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True}" />
+                            Maximum="{Binding Length}" Value="{Binding Position, Mode=TwoWay, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True}"
+                            Style="{StaticResource SliderStyle}"/>
 
                     <!--control area-->
                     <Grid Grid.Row="1">

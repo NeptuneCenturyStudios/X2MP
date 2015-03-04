@@ -46,7 +46,12 @@
                             <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
 
-                        <Slider Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Center" Minimum="{Binding Min}" Maximum="{Binding Max}"
+                        <Slider Grid.Row="0"
+                                Orientation="Vertical"
+                                Style="{StaticResource SliderStyle}"
+                                HorizontalAlignment="Center" 
+                                Minimum="{Binding Min}" 
+                                Maximum="{Binding Max}"
                                 Value="{Binding Gain, Mode=TwoWay}" />
 
                         <TextBlock Grid.Row="1" Text="{Binding Center, StringFormat='{}{0}hz'}" HorizontalAlignment="Center" />
