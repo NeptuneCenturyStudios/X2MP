@@ -14,18 +14,31 @@
         
         <Grid Grid.Column="0">
             <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
 
             <Button Grid.Row="0"
+                    ToolTip="Raise gain by 1db"
+                    Style="{StaticResource ImageButton}"
+                    Command="{Binding RaiseGain}">
+                <Image Source="/Resources/reset-eq.png" Stretch="None"/>
+            </Button>
+            
+            <Button Grid.Row="1"
                     ToolTip="Reset equalizer to center"
                     Style="{StaticResource ImageButton}"
                     Command="{Binding ResetEq}">
                 <Image Source="/Resources/reset-eq.png" Stretch="None"/>
             </Button>
-            
-            <TextBlock Grid.Row="1">Adjust</TextBlock>
+
+            <Button Grid.Row="2"
+                    ToolTip="Lower gain by 1db"
+                    Style="{StaticResource ImageButton}"
+                    Command="{Binding LowerGain}">
+                <Image Source="/Resources/reset-eq.png" Stretch="None"/>
+            </Button>
         </Grid>
         
         
@@ -52,7 +65,9 @@
                                 HorizontalAlignment="Center" 
                                 Minimum="{Binding Min}" 
                                 Maximum="{Binding Max}"
-                                Value="{Binding Gain, Mode=TwoWay}" />
+                                Value="{Binding Gain, Mode=TwoWay}" 
+                                TickFrequency="5"
+                                />
 
                         <TextBlock Grid.Row="1" Text="{Binding Center, StringFormat='{}{0}hz'}" HorizontalAlignment="Center" />
                     </Grid>

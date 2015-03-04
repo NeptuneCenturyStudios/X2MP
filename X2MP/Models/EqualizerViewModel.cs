@@ -20,6 +20,10 @@ namespace X2MP.Models
 
         public Command ResetEq { get; private set; }
 
+        public Command RaiseGain { get; private set; }
+
+        public Command LowerGain { get; private set; }
+
         #endregion
         #endregion
 
@@ -52,6 +56,50 @@ namespace X2MP.Models
                     //fmod docs indicate that a value of 1.0 represents original,
                     //unmodified sound
                     eqInfo.Gain = 1.0f;
+                }
+            });
+
+            //raise
+            RaiseGain = new Command((parameter) =>
+            {
+
+                foreach (var eqInfo in EqualizerBands)
+                {
+                    //if any eq bands would go out of range, stop
+                    if (eqInfo.Gain + 1.0f > eqInfo.Max)
+                    {
+                        return;
+                    }
+                }
+
+                //clear
+                foreach (var eqInfo in EqualizerBands)
+                {
+                    //fmod docs indicate that a value of 1.0 represents original,
+                    //unmodified sound
+                    eqInfo.Gain += 1.0f;
+                }
+            });
+
+            //lower
+            LowerGain = new Command((parameter) =>
+            {
+
+                foreach (var eqInfo in EqualizerBands)
+                {
+                    //if any eq bands would go out of range, stop
+                    if (eqInfo.Gain - 1.0f < eqInfo.Min)
+                    {
+                        return;
+                    }
+                }
+
+                //clear
+                foreach (var eqInfo in EqualizerBands)
+                {
+                    //fmod docs indicate that a value of 1.0 represents original,
+                    //unmodified sound
+                    eqInfo.Gain -= 1.0f;
                 }
             });
         }

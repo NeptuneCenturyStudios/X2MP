@@ -8,9 +8,11 @@
         ResizeMode="CanResizeWithGrip"
         MinWidth="325"
         MinHeight="200"
-        Style="{StaticResource WindowStyle}"
+        Style="{DynamicResource WindowStyle}"
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
         >
+    
+    
     <Window.Effect>
         <DropShadowEffect BlurRadius="25" ShadowDepth="0" />
     </Window.Effect>
@@ -49,7 +51,7 @@
                             ToolTip="Display the equalizer">
                         <Image Source="/Resources/equalizer.png"/>
                     </Button>
-                    
+
                 </StackPanel>
             </Grid>
 
@@ -119,13 +121,13 @@
                                 Command="{Binding Stop}">
                                 <Image Source="/Resources/stop.png" Stretch="None"/>
                             </Button>
-                            
+
                             <!--previous-->
                             <Button Style="{StaticResource ControlButton}"
                                 Command="{Binding Prev}">
                                 <Image Source="/Resources/prev.png" Stretch="None"/>
                             </Button>
-                            
+
                             <!--play / pause-->
                             <Button Style="{StaticResource ControlButton}"
                                 Width="52"
@@ -150,7 +152,7 @@
                                 </Image>
 
                             </Button>
-                            
+
                             <!--next-->
                             <Button Style="{StaticResource ControlButton}"
                                 Command="{Binding Next}">

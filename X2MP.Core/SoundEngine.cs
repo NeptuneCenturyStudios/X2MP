@@ -596,17 +596,21 @@ namespace X2MP.Core
         /// </summary>
         private void InitializeEqualizerBands()
         {
+            var min = -6.0f;   //min can be as low as -30, but we dont want that for now
+            var max = 7.0f;    //max can be as high as 30, but we dont want that for now
+            var gain = 1.0f;    //fmod's default gain value, means no modification to sound
+
             EqualizerBands = new[] { 
-                new ParamEqInfo() { Center = 31.5f    , Min=-30.0f, Max=30.0f, Gain=1.0f },
-                new ParamEqInfo() { Center = 62.5f    , Min=-30.0f, Max=30.0f, Gain=1.0f },
-                new ParamEqInfo() { Center = 125.0f   , Min=-30.0f, Max=30.0f, Gain=1.0f },
-                new ParamEqInfo() { Center = 250.0f   , Min=-30.0f, Max=30.0f, Gain=1.0f },
-                new ParamEqInfo() { Center = 500.0f   , Min=-30.0f, Max=30.0f, Gain=1.0f },
-                new ParamEqInfo() { Center = 1000.0f  , Min=-30.0f, Max=30.0f, Gain=1.0f },
-                new ParamEqInfo() { Center = 2000.0f  , Min=-30.0f, Max=30.0f, Gain=1.0f },
-                new ParamEqInfo() { Center = 4000.0f  , Min=-30.0f, Max=30.0f, Gain=1.0f },
-                new ParamEqInfo() { Center = 8000.0f  , Min=-30.0f, Max=30.0f, Gain=1.0f },
-                new ParamEqInfo() { Center = 16000.0f , Min=-30.0f, Max=30.0f, Gain=1.0f }
+                new ParamEqInfo() { Center = 31.5f    , Min=min, Max=max, Gain=gain },
+                new ParamEqInfo() { Center = 62.5f    , Min=min, Max=max, Gain=gain },
+                new ParamEqInfo() { Center = 125.0f   , Min=min, Max=max, Gain=gain },
+                new ParamEqInfo() { Center = 250.0f   , Min=min, Max=max, Gain=gain },
+                new ParamEqInfo() { Center = 500.0f   , Min=min, Max=max, Gain=gain },
+                new ParamEqInfo() { Center = 1000.0f  , Min=min, Max=max, Gain=gain },
+                new ParamEqInfo() { Center = 2000.0f  , Min=min, Max=max, Gain=gain },
+                new ParamEqInfo() { Center = 4000.0f  , Min=min, Max=max, Gain=gain },
+                new ParamEqInfo() { Center = 8000.0f  , Min=min, Max=max, Gain=gain },
+                new ParamEqInfo() { Center = 16000.0f , Min=min, Max=max, Gain=gain }
             };
 
             //create instance of list
@@ -762,9 +766,12 @@ namespace X2MP.Core
         {
             FMOD.RESULT result;
 
-            //set position
-            result = _channel.setPosition(position, FMOD.TIMEUNIT.MS);
-            CheckError(result);
+            if (_channel != null)
+            {
+                //set position
+                result = _channel.setPosition(position, FMOD.TIMEUNIT.MS);
+                CheckError(result);
+            }
         }
 
         #endregion
