@@ -190,6 +190,7 @@ namespace X2MP.Core
             //initialize the playlist
             NowPlaying = new PlayList();
             PlayListIndex = -1;
+            RepeatOn = true;
 
             //create history
             History = new List<PlayListEntry>();
