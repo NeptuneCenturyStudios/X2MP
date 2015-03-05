@@ -38,49 +38,16 @@ namespace X2MP.Core
         /// </summary>
         private CancellationTokenSource _playbackCts;
 
+        /// <summary>
+        /// Stores a reference to the currently playing track
+        /// </summary>
         private PlayListEntry _playingEntry;
 
         #endregion
 
         #region Properties
 
-        /// <summary>
-        /// Gets or sets the playlist index
-        /// </summary>
-        private int _playListIndex;
-        private int PlayListIndex
-        {
-            get
-            {
-                return _playListIndex;
-            }
-            set
-            {
-                //check
-                if (value > NowPlaying.Count - 1)
-                {
-                    value = NowPlaying.Count - 1;
-                }
 
-                if (value < -1)
-                {
-                    value = -1;
-                }
-
-                //set index
-                _playListIndex = value;
-            }
-        }
-
-        /// <summary>
-        /// Stores a history of what songs have been played automatically
-        /// </summary>
-        private List<PlayListEntry> History { get; set; }
-
-        /// <summary>
-        /// A pointer to the current position in the history buffer
-        /// </summary>
-        private int HistoryPointer { get; set; }
 
         /// <summary>
         /// Gets the current wave data frame from the DSP unit
@@ -125,22 +92,6 @@ namespace X2MP.Core
         }
 
         /// <summary>
-        /// We update this from within the playback loop thread.
-        /// This notifies listeners of changes for the "Position" property
-        /// </summary>
-        private uint InternalPosition
-        {
-            get { return _position; }
-            set
-            {
-                _position = value;
-
-                //raise changed event
-                OnPropertyChanged("Position");
-            }
-        }
-
-        /// <summary>
         /// Gets whether the system is paused or not
         /// </summary>
         private bool _isPlaying;
@@ -157,11 +108,76 @@ namespace X2MP.Core
         }
 
         /// <summary>
+        /// Gets the available equalizer bands
+        /// </summary>
+        public ParamEqInfo[] EqualizerBands { get; private set; }
+
+        /// <summary>
+        /// Gets or sets whether the system will restart the playlist after the last track has been played
+        /// </summary>
+        public bool RepeatOn { get; set; }
+        #endregion
+
+        #region Private Properties
+
+        /// <summary>
+        /// Gets or sets the playlist index
+        /// </summary>
+        private int _playListIndex;
+        private int PlayListIndex
+        {
+            get
+            {
+                return _playListIndex;
+            }
+            set
+            {
+                //check
+                if (value > NowPlaying.Count - 1)
+                {
+                    value = NowPlaying.Count - 1;
+                }
+
+                if (value < -1)
+                {
+                    value = -1;
+                }
+
+                //set index
+                _playListIndex = value;
+            }
+        }
+
+        /// <summary>
+        /// Stores a history of what songs have been played automatically
+        /// </summary>
+        private List<PlayListEntry> History { get; set; }
+
+        /// <summary>
+        /// A pointer to the current position in the history buffer
+        /// </summary>
+        private int HistoryPointer { get; set; }
+        /// <summary>
         /// Indicates that the system is stopping
         /// </summary>
         private bool IsStopping { get; set; }
 
-        public ParamEqInfo[] EqualizerBands { get; private set; }
+        /// <summary>
+        /// We update this from within the playback loop thread.
+        /// This notifies listeners of changes for the "Position" property
+        /// </summary>
+        private uint InternalPosition
+        {
+            get { return _position; }
+            set
+            {
+                _position = value;
+
+                //raise changed event
+                OnPropertyChanged("Position");
+            }
+        }
+
         #endregion
 
         #region Constructor / Destructor
@@ -366,12 +382,6 @@ namespace X2MP.Core
         {
             FMOD.RESULT result;
 
-            //release any playing sound
-            if (_sound != null)
-            {
-                _sound.release();
-            }
-
             //load a new sound
             result = _system.createSound(entry.FileName, FMOD.MODE._2D | FMOD.MODE.NONBLOCKING | FMOD.MODE.CREATESTREAM, out _sound);
             CheckError(result);
@@ -396,56 +406,6 @@ namespace X2MP.Core
         }
 
         /// <summary>
-        /// Begins playback. This method is called when the user initiates playback.
-        /// </summary>
-        private void Play(PlayListEntry entry)
-        {
-            if (entry == null)
-            {
-                //throw an error
-                throw new ArgumentNullException("entry");
-            }
-
-            //set playing
-            IsPlaying = true;
-
-            //create new cancellation token
-            _playbackCts = new CancellationTokenSource();
-
-            //create a play task
-            var playTask = Task.Run(() =>
-            {
-                //send the media to be played
-                LoadMedia(entry);
-
-                //play the stream. holds thread hostage until playback stops
-                PlayStream();
-
-            }, _playbackCts.Token);
-
-
-            //when playback is stopped, handle what to do next
-            //either we exit and go idle, or we pick the next track.
-            //if the user selected a different entry to play, we treat it like a hard stop.
-            playTask.ContinueWith((t) =>
-            {
-                //if canceled, exit
-                if (IsStopping)
-                {
-                    //reset
-                    IsStopping = false;
-                    //exit
-                    return;
-                }
-
-                //play the next song
-                Run();
-            });
-
-
-        }
-
-        /// <summary>
         /// Takes a media info object and plays it on an open channel
         /// </summary>
         /// <param name="media"></param>
@@ -454,21 +414,6 @@ namespace X2MP.Core
         {
             //result
             FMOD.RESULT result;
-
-            //stop any playing channels
-            if (_channel != null)
-            {
-                _channel.stop();
-            }
-
-            //free DSP
-            if (_dsp != null)
-            {
-                _dsp.release();
-            }
-
-            //destroy the equalizer
-            DestroyEqualizer();
 
             //play the sound on the channel
             result = _system.playSound(_sound, null, true, out _channel);
@@ -521,6 +466,59 @@ namespace X2MP.Core
         }
 
         /// <summary>
+        /// Begins playback. This method is called when the user initiates playback.
+        /// </summary>
+        private void Play(PlayListEntry entry)
+        {
+            if (entry == null)
+            {
+                //throw an error
+                throw new ArgumentNullException("entry");
+            }
+
+            //set playing
+            IsPlaying = true;
+
+            //create new cancellation token
+            _playbackCts = new CancellationTokenSource();
+
+            //create a play task
+            var playTask = Task.Run(() =>
+            {
+                //reset
+                FreeChannelResources();
+
+                //send the media to be played
+                LoadMedia(entry);
+
+                //play the stream. holds thread hostage until playback stops
+                PlayStream();
+
+            }, _playbackCts.Token);
+
+
+            //when playback is stopped, handle what to do next
+            //either we exit and go idle, or we pick the next track.
+            //if the user selected a different entry to play, we treat it like a hard stop.
+            playTask.ContinueWith((t) =>
+            {
+                //if canceled, exit
+                if (IsStopping)
+                {
+                    //reset
+                    IsStopping = false;
+                    //exit
+                    return;
+                }
+
+                //play the next song
+                Run();
+            });
+
+
+        }
+
+        /// <summary>
         /// Pauses or unpauses playback
         /// </summary>
         private void Pause()
@@ -565,26 +563,48 @@ namespace X2MP.Core
             //cancel
             _playbackCts.Cancel();
 
-            //stop playback
-            if (_channel != null)
-            {
-                _channel.stop();
-                _channel = null;
-
-                _sound.release();
-                _sound = null;
-            }
+            //free up some resources
+            FreeChannelResources();
 
             //clear history
             if (resetHistory)
             {
-                History.Clear();
-                HistoryPointer = 0;
-                PlayListIndex = -1;
+                ResetPlaylist();
             }
 
             //fire PlaybackStatusChanged event
             OnPlaybackStatusChanged();
+        }
+
+        /// <summary>
+        /// Frees channel, sound and DSP resources
+        /// </summary>
+        private void FreeChannelResources()
+        {
+
+            //stop any playing channels
+            if (_channel != null)
+            {
+                _channel.stop();
+                _channel = null;
+            }
+
+            //release sound
+            if (_sound != null)
+            {
+                _sound.release();
+                _sound = null;
+            }
+
+            //free waveform DSP
+            if (_dsp != null)
+            {
+                _dsp.release();
+                _dsp = null;
+            }
+
+            //destroy the equalizer
+            DestroyEqualizer();
         }
 
         #endregion
@@ -779,6 +799,16 @@ namespace X2MP.Core
         #region Playlist Methods
 
         /// <summary>
+        /// Resets the playlist and history
+        /// </summary>
+        private void ResetPlaylist()
+        {
+            History.Clear();
+            HistoryPointer = 0;
+            PlayListIndex = -1;
+        }
+
+        /// <summary>
         /// Adds a new entry to the now playing list, and adds it to the internal playlist if currently playing
         /// </summary>
         /// <param name="entry"></param>
@@ -866,6 +896,16 @@ namespace X2MP.Core
             }
             else
             {
+                if (RepeatOn)
+                {
+                    //reset the playlist
+                    ResetPlaylist();
+
+                    //get next media
+                    return GetNextMedia();
+                }
+
+                //return null to end playback
                 return null;
             }
         }
