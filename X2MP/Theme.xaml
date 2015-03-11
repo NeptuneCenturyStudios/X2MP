@@ -99,11 +99,11 @@
         <Setter Property="FontSize" Value="16px" />
     </Style>
 
-    <Style x:Key="MyFocusVisualStyte" >
+    <Style x:Key="SliderFocusStyle" >
         <Setter Property="Control.Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Rectangle x:Name="FocusStyle" StrokeDashArray="4 4" RadiusX="5" RadiusY="5" Fill="Transparent"
+                    <Rectangle x:Name="FocusStyle" StrokeDashArray="4 4" Fill="Transparent"
                            Stroke="#99029cc7" StrokeThickness="1" />
                 </ControlTemplate>
             </Setter.Value>
@@ -117,7 +117,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type RepeatButton}">
-                    <Rectangle Width="4" Fill="#FF34b4e3"/>
+                    <Rectangle Margin="0,0,0,10" Width="4" Fill="#FF34b4e3"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -268,7 +268,7 @@
     </ControlTemplate>
 
     <Style x:Key="SliderStyle" TargetType="{x:Type Slider}">
-        <Setter Property="FocusVisualStyle" Value="{StaticResource MyFocusVisualStyte}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource SliderFocusStyle}" />
         <Setter Property="SnapsToDevicePixels" Value="true" />
         <Setter Property="OverridesDefaultStyle" Value="true" />
         <Style.Triggers>
