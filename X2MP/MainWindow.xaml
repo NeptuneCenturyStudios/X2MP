@@ -11,8 +11,8 @@
         Style="{DynamicResource WindowStyle}"
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
         >
-    
-    
+
+
     <Window.Effect>
         <DropShadowEffect BlurRadius="25" ShadowDepth="0" />
     </Window.Effect>
@@ -38,12 +38,16 @@
                             ToolTip="Power down the player">
                         <Image Source="/Resources/power.png"/>
                     </Button>
-                    <Button Command="{Binding OpenCollection}">
-                        Collection
+                    <Button Command="{Binding OpenCollection}"
+                            Style="{StaticResource ImageButton}"
+                            ToolTip="Display your collection">
+                        <Image Source="/Resources/now-playing.png"/>
                     </Button>
 
-                    <Button Command="{Binding OpenNowPlaying}">
-                        Now Playing
+                    <Button Command="{Binding OpenNowPlaying}"
+                            Style="{StaticResource ImageButton}"
+                            ToolTip="Display the Now Playing window">
+                        <Image Source="/Resources/now-playing.png"/>
                     </Button>
 
                     <Button Command="{Binding OpenEqualizer}"
@@ -115,19 +119,19 @@
 
                         <!--control buttons-->
                         <StackPanel Grid.Column="1" Orientation="Horizontal" >
-
-                            <!--stop-->
-                            <Button Style="{StaticResource ControlButton}"
-                                Command="{Binding Stop}">
-                                <Image Source="/Resources/stop.png" Stretch="None"/>
-                            </Button>
-
+                           
                             <!--previous-->
                             <Button Style="{StaticResource ControlButton}"
                                 Command="{Binding Prev}">
                                 <Image Source="/Resources/prev.png" Stretch="None"/>
                             </Button>
 
+                            <!--stop-->
+                            <Button Style="{StaticResource ControlButton}"
+                                Command="{Binding Stop}">
+                                <Image Source="/Resources/stop.png" Stretch="None"/>
+                            </Button>
+                            
                             <!--play / pause-->
                             <Button Style="{StaticResource ControlButton}"
                                 Width="52"
@@ -155,9 +159,14 @@
 
                             <!--next-->
                             <Button Style="{StaticResource ControlButton}"
-                                Command="{Binding Next}">
+                                    Command="{Binding Next}">
                                 <Image Source="/Resources/next.png" Stretch="None"/>
                             </Button>
+
+                            <!--repeat-->
+                            <CheckBox IsChecked="{Binding RepeatOn}" VerticalAlignment="Center">
+                                Repeat
+                            </CheckBox>
 
                         </StackPanel>
                     </Grid>

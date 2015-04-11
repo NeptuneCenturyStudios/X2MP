@@ -101,6 +101,19 @@ namespace X2MP.Models
                 OnPropertyChanged("CurrentTime");
             }
         }
+
+        public bool RepeatOn
+        {
+            get { return App.SoundEngine.RepeatOn; }
+            set
+            {
+                App.SoundEngine.RepeatOn = value;
+
+                //raise changed event
+                OnPropertyChanged("RepeatOn");
+            }
+        }
+
         #endregion
 
         #region Commands
@@ -188,14 +201,14 @@ namespace X2MP.Models
             //open collection view
             OpenCollection = new Command((parameter) =>
             {
-                //display the Now Playing component
-                Component = null;
+                //display the collection component
+                Component = new CollectionUserControl();
             });
 
             //create commands
             OpenEqualizer = new Command((parameter) =>
             {
-                //display the Now Playing component
+                //display the equalizer component
                 Component = new EqualizerUserControl();
             });
 
