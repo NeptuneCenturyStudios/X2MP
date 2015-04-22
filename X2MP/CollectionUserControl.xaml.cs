@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using X2MP.Core;
+using X2MP.Models;
 
 namespace X2MP
 {
@@ -23,6 +25,20 @@ namespace X2MP
         public CollectionUserControl()
         {
             InitializeComponent();
+            var model = new CollectionViewModel();
+            foreach(var entry in App.SoundEngine.NowPlaying){
+                model.Collection.Add(entry);
+            }
+            this.DataContext = model;
+        }
+
+        protected void Grid_DoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            //get the playlist item
+            var entry = ((ListViewItem)sender).Content as PlayListEntry;
+
+            //play the song
+            App.SoundEngine.PlayOrPause(entry);
         }
     }
 }

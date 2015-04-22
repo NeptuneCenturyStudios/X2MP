@@ -94,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\BaseViewModel.cs" />
+    <Compile Include="Models\CollectionViewModel.cs" />
     <Compile Include="Models\Command.cs" />
     <Compile Include="Models\EqualizerViewModel.cs" />
     <Compile Include="Models\MainWindowViewModel.cs" />

@@ -6,6 +6,46 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-            
+        <!--SelectedItem="{Binding SelectedItem, Mode=TwoWay}"-->
+        <ListView x:Name="CollectionListView"  
+                  ItemsSource="{ Binding Collection }"
+                  
+                  Opacity="0.75"
+                  VirtualizingPanel.VirtualizationMode="Recycling">
+            <ListView.Resources>
+                <Style TargetType="ListViewItem">
+                    <EventSetter Event="MouseDoubleClick" Handler="Grid_DoubleClick" />
+                </Style>
+            </ListView.Resources>
+
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Source="/Resources/playing.png">
+                                    <Image.Style>
+                                        <Style TargetType="Image">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsPlaying}" Value="false">
+                                                    <Setter Property="Visibility" Value="Hidden"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Image.Style>
+
+                                </Image>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Track" Width="50" DisplayMemberBinding="{Binding TagInfo.Track}" />
+                    <GridViewColumn Header="Title" Width="225" DisplayMemberBinding="{Binding TagInfo.Title}" />
+                    <GridViewColumn Header="Album" Width="150" DisplayMemberBinding="{Binding TagInfo.Album}" />
+                    <GridViewColumn Header="Artist" Width="150" DisplayMemberBinding="{Binding TagInfo.Artist}" />
+                </GridView>
+            </ListView.View>
+
+        </ListView>
     </Grid>
 </UserControl>
