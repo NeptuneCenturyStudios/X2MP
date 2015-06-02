@@ -7,7 +7,7 @@ using System.Windows.Input;
 
 namespace X2MP.Models
 {
-    class Command : ICommand
+    public class Command : ICommand
     {
         public event EventHandler CanExecuteChanged;
 

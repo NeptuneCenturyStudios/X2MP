@@ -15,7 +15,7 @@ using X2MP.Core;
 
 namespace X2MP.Models
 {
-    class MainWindowViewModel : BaseViewModel
+    public class MainWindowViewModel : BaseViewModel
     {
         #region Events
 
@@ -119,7 +119,12 @@ namespace X2MP.Models
         #region Commands
 
         /// <summary>
-        /// Gets the command for the now playing button
+        /// Gets the command for the visualizer button
+        /// </summary>
+        public ICommand OpenVisualizer { get; private set; }
+
+        /// <summary>
+        /// Gets the command for the equalizer button
         /// </summary>
         public ICommand OpenEqualizer { get; private set; }
 
@@ -210,6 +215,13 @@ namespace X2MP.Models
             {
                 //display the equalizer component
                 Component = new EqualizerUserControl();
+            });
+
+            //open visualizer
+            OpenVisualizer = new Command((parameter) =>
+            {
+                //display the visualizer component
+                Component = new VisualizerUserControl(this);
             });
 
             //play or pause

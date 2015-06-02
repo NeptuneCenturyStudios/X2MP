@@ -7,7 +7,7 @@ using X2MP.Core;
 
 namespace X2MP.Models
 {
-    class EqualizerViewModel
+    public class EqualizerViewModel : BaseViewModel
     {
         #region Properties
 
@@ -43,7 +43,7 @@ namespace X2MP.Models
             }
         }
         #endregion
-        
+
         #region Register Commands
         private void RegisterCommands()
         {

@@ -22,16 +22,15 @@
 
         <Grid>
 
-            <!--define a section for our controls which will always be visible-->
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="auto" />
-            </Grid.RowDefinitions>
+            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
             <!--grid for menu items-->
-            <Grid Grid.Row="0">
-                <StackPanel Orientation="Horizontal">
+            <Grid Grid.Column="0" Style="{StaticResource ResourceKey=SideMenuStyle}">
+                <StackPanel Orientation="Vertical">
                     <Button x:Name="CloseButton" 
                             Style="{StaticResource ImageButton}"
                             Click="CloseButton_Click"
@@ -50,47 +49,44 @@
                         <Image Source="/Resources/now-playing.png"/>
                     </Button>
 
+                    <Button Command="{Binding OpenVisualizer}"
+                            Style="{StaticResource ImageButton}"
+                            ToolTip="Display the visualizer">
+                        <Image Source="/Resources/equalizer.png"/>
+                    </Button>
+                    
                     <Button Command="{Binding OpenEqualizer}"
                             Style="{StaticResource ImageButton}"
                             ToolTip="Display the equalizer">
                         <Image Source="/Resources/equalizer.png"/>
                     </Button>
-
+                    
                 </StackPanel>
             </Grid>
 
             <!--grid for everything else-->
-            <Grid Grid.Row="1" >
+            <Grid Grid.Column="1" >
+                <!--define a section for our controls which will always be visible-->
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
 
-                <!--<Image x:Name="vis" Width="648" Height="270" >
-                    
-                </Image>-->
-                <!--<c:RenderCanvas x:Name="vis"></c:RenderCanvas>-->
-                <Canvas x:Name="vis" >
-
-                    <Image x:Name="vimg"/>
-
-                </Canvas>
-                <!--<WindowsFormsHost Grid.ColumnSpan="2" >
-                    <local:Visualizer x:Name="vis" Width="500" Height="270" />
-                </WindowsFormsHost>-->
-
-
-                <ContentControl Content="{Binding Component}"
+                <ContentControl Grid.Row="1" Content="{Binding Component}"
                                 Margin="10" Grid.ColumnSpan="2"/>
 
-            </Grid>
 
-            <!--controls-->
-            <Grid Grid.Row="2" Background="AliceBlue">
-                <Grid Margin="10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="auto"/>
-                    </Grid.RowDefinitions>
+                <!--controls-->
+                <Grid Grid.Row="2" Background="AliceBlue">
+                    <Grid Margin="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
 
-                    <!--time slider-->
-                    <Slider Grid.Row="0"
+                        <!--time slider-->
+                        <Slider Grid.Row="0"
                             LargeChange="5000"
                             SmallChange="1000"
                             Thumb.DragStarted="Slider_DragStarted"
@@ -98,80 +94,83 @@
                             Maximum="{Binding Length}" Value="{Binding Position, Mode=TwoWay, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True}"
                             Style="{StaticResource SliderStyle}"/>
 
-                    <!--control area-->
-                    <Grid Grid.Row="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="150"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                        <!--control area-->
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
 
-                        <!--time counter-->
-                        <TextBlock Grid.Column="0" VerticalAlignment="Center" FontSize="20" Foreground="Gray">
-                            <TextBlock.Text>
-                                <MultiBinding StringFormat="{}{0:D2}:{1:D2}:{2:D2}">
-                                    <Binding Path="CurrentTime.Hours"/>
-                                    <Binding Path="CurrentTime.Minutes"/>
-                                    <Binding Path="CurrentTime.Seconds"/>
-                                </MultiBinding>
-                            </TextBlock.Text>
+                            <!--time counter-->
+                            <TextBlock Grid.Column="0" VerticalAlignment="Center" FontSize="20" Foreground="Gray">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0:D2}:{1:D2}:{2:D2}">
+                                        <Binding Path="CurrentTime.Hours"/>
+                                        <Binding Path="CurrentTime.Minutes"/>
+                                        <Binding Path="CurrentTime.Seconds"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
 
-                        </TextBlock>
+                            </TextBlock>
 
-                        <!--control buttons-->
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" >
-                           
-                            <!--previous-->
-                            <Button Style="{StaticResource ControlButton}"
+                            <!--control buttons-->
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" >
+
+                                <!--previous-->
+                                <Button Style="{StaticResource ControlButton}"
                                 Command="{Binding Prev}">
-                                <Image Source="/Resources/prev.png" Stretch="None"/>
-                            </Button>
+                                    <Image Source="/Resources/prev.png" Stretch="None"/>
+                                </Button>
 
-                            <!--stop-->
-                            <Button Style="{StaticResource ControlButton}"
+                                <!--stop-->
+                                <Button Style="{StaticResource ControlButton}"
                                 Command="{Binding Stop}">
-                                <Image Source="/Resources/stop.png" Stretch="None"/>
-                            </Button>
-                            
-                            <!--play / pause-->
-                            <Button Style="{StaticResource ControlButton}"
+                                    <Image Source="/Resources/stop.png" Stretch="None"/>
+                                </Button>
+
+                                <!--play / pause-->
+                                <Button Style="{StaticResource ControlButton}"
                                 Width="52"
                                 Height="52"
                                 Command="{Binding Play}"
                                 CommandParameter="0">
 
-                                <!--pause or play image, depending on player status-->
-                                <Image Stretch="None" >
-                                    <Image.Resources>
-                                        <Style TargetType="Image">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsPlaying}" Value="false">
-                                                    <Setter Property="Source" Value="/Resources/play.png"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding IsPlaying}" Value="true">
-                                                    <Setter Property="Source" Value="/Resources/pause.png" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Image.Resources>
-                                </Image>
+                                    <!--pause or play image, depending on player status-->
+                                    <Image Stretch="None" >
+                                        <Image.Resources>
+                                            <Style TargetType="Image">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsPlaying}" Value="false">
+                                                        <Setter Property="Source" Value="/Resources/play.png"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsPlaying}" Value="true">
+                                                        <Setter Property="Source" Value="/Resources/pause.png" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Image.Resources>
+                                    </Image>
 
-                            </Button>
+                                </Button>
 
-                            <!--next-->
-                            <Button Style="{StaticResource ControlButton}"
+                                <!--next-->
+                                <Button Style="{StaticResource ControlButton}"
                                     Command="{Binding Next}">
-                                <Image Source="/Resources/next.png" Stretch="None"/>
-                            </Button>
+                                    <Image Source="/Resources/next.png" Stretch="None"/>
+                                </Button>
 
-                            <!--repeat-->
-                            <CheckBox IsChecked="{Binding RepeatOn}" VerticalAlignment="Center">
-                                Repeat
-                            </CheckBox>
+                                <!--repeat-->
+                                <CheckBox IsChecked="{Binding RepeatOn}" VerticalAlignment="Center">
+                                    Repeat
+                                </CheckBox>
 
-                        </StackPanel>
+                            </StackPanel>
+                        </Grid>
+
+
+
+
                     </Grid>
-
-
 
 
                 </Grid>
@@ -179,6 +178,7 @@
 
             </Grid>
 
+            
 
         </Grid>
     </Border>

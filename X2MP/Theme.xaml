@@ -284,4 +284,9 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+    
+    <!--this style is for the side menu-->
+    <Style x:Key="SideMenuStyle" TargetType="{x:Type Grid}">
+        <Setter Property="Background" Value="DarkGray" />
+    </Style>
 </ResourceDictionary>

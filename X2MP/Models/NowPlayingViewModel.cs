@@ -15,7 +15,7 @@ namespace X2MP.Models
     /// <summary>
     /// View model for Now Playing view
     /// </summary>
-    class NowPlayingViewModel : BaseViewModel
+    public class NowPlayingViewModel : BaseViewModel
     {
         #region Properties
 

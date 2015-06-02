@@ -8,7 +8,7 @@ using X2MP.Core;
 
 namespace X2MP.Models
 {
-    class CollectionViewModel : BaseViewModel
+    public class CollectionViewModel : BaseViewModel
     {
 
         public ObservableCollection<PlayListEntry> Collection { get; set; }
