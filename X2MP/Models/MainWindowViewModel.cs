@@ -48,17 +48,18 @@ namespace X2MP.Models
             private set
             {
 
-                if (_component is VisualizerUserControl)
+                //check to see if we can cast as an IPlayerComponent
+                //if we can, call the Dispose method
+                if (_component is IPlayerComponent)
                 {
                     //free
-                    var visComponent = (VisualizerUserControl)_component;
+                    var visComponent = (IPlayerComponent)_component;
                     visComponent.Dispose();
                 }
                 
+                //set the component
                 _component = value;
-
                 
-
                 //raise changed event
                 OnPropertyChanged(() => this.Component);
             }

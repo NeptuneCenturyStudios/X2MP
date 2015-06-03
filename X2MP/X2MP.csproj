@@ -82,6 +82,7 @@
     <Compile Include="Controls\EqualizerUserControl.xaml.cs">
       <DependentUpon>EqualizerUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Classes\IPlayerComponent.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

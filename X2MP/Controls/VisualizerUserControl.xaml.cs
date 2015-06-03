@@ -20,7 +20,7 @@ namespace X2MP
     /// <summary>
     /// Interaction logic for VisualizerUserControl.xaml
     /// </summary>
-    public partial class VisualizerUserControl : UserControl, IDisposable
+    public partial class VisualizerUserControl : UserControl, IPlayerComponent
     {
         public VisualizerUserControl(MainWindowViewModel model)
         {
