@@ -64,7 +64,7 @@ namespace X2MP
             var width = vis.ActualWidth;
             var height = vis.ActualHeight;
 
-            int numPoints = 128;
+            int numPoints = 64;
             int skip = e.SampleBuffer.Length / numPoints;
 
             double lineSpacing = (width / (numPoints)); //256 points
