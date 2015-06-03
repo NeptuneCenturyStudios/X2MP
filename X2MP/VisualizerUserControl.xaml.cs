@@ -20,7 +20,7 @@ namespace X2MP
     /// <summary>
     /// Interaction logic for VisualizerUserControl.xaml
     /// </summary>
-    public partial class VisualizerUserControl : UserControl
+    public partial class VisualizerUserControl : UserControl, IDisposable
     {
         public VisualizerUserControl(MainWindowViewModel model)
         {
@@ -111,6 +111,23 @@ namespace X2MP
             //}, System.Windows.Threading.DispatcherPriority.Render);
         }
 
-        
+
+
+        bool _isDisposed = false;
+        //TODO: make a base class for components that support disposing
+        public void Dispose()
+        {
+            if (!_isDisposed)
+            {
+                //get the model
+                var model = this.DataContext as MainWindowViewModel;
+                //stop visual processing
+                model.VisualizationUpdated -= model_VisualizationUpdated;
+                //null the source
+                vimg.Source = null;
+
+                _isDisposed = true;
+            }
+        }
     }
 }

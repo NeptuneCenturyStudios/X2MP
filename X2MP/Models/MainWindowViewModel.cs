@@ -47,7 +47,17 @@ namespace X2MP.Models
             }
             private set
             {
+
+                if (_component is VisualizerUserControl)
+                {
+                    //free
+                    var visComponent = (VisualizerUserControl)_component;
+                    visComponent.Dispose();
+                }
+                
                 _component = value;
+
+                
 
                 //raise changed event
                 OnPropertyChanged(() => this.Component);
@@ -220,8 +230,6 @@ namespace X2MP.Models
             //open visualizer
             OpenVisualizer = new Command((parameter) =>
             {
-
-
 
                 //display the visualizer component
                 Component = new VisualizerUserControl(this);
