@@ -176,7 +176,8 @@ namespace X2MP.Models
         {
             Window = window;
 
-            Component = null;
+            //set the initial component to be the collection
+            Component = new CollectionUserControl();
 
             //create timer. we are using timer because it performs better than a thread in
             //in this case. uses less CPU.
