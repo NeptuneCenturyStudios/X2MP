@@ -220,6 +220,9 @@ namespace X2MP.Models
             //open visualizer
             OpenVisualizer = new Command((parameter) =>
             {
+
+
+
                 //display the visualizer component
                 Component = new VisualizerUserControl(this);
             });

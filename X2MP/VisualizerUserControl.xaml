@@ -7,7 +7,7 @@
              d:DesignHeight="300" d:DesignWidth="300"
              Loaded="UserControl_Loaded">
     <Grid>
-        <Canvas x:Name="vis" >
+        <Canvas x:Name="vis" Background="Black" >
 
             <Image x:Name="vimg"/>
 

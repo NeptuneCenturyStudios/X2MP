@@ -52,7 +52,7 @@
                     <Button Command="{Binding OpenVisualizer}"
                             Style="{StaticResource ImageButton}"
                             ToolTip="Display the visualizer">
-                        <Image Source="/Resources/equalizer.png"/>
+                        <Image Source="/Resources/vis.png"/>
                     </Button>
                     
                     <Button Command="{Binding OpenEqualizer}"
@@ -74,7 +74,7 @@
                 </Grid.RowDefinitions>
 
                 <ContentControl Grid.Row="1" Content="{Binding Component}"
-                                Margin="10" Grid.ColumnSpan="2"/>
+                                Margin="0" Grid.ColumnSpan="2"/>
 
 
                 <!--controls-->
