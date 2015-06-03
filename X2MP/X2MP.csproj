@@ -57,14 +57,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="VisualizerUserControl.xaml.cs">
+    <Compile Include="Controls\VisualizerUserControl.xaml.cs">
       <DependentUpon>VisualizerUserControl.xaml</DependentUpon>
     </Compile>
-    <Page Include="CollectionUserControl.xaml">
+    <Page Include="Controls\CollectionUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="EqualizerUserControl.xaml">
+    <Page Include="Controls\EqualizerUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -76,17 +76,17 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="CollectionUserControl.xaml.cs">
+    <Compile Include="Controls\CollectionUserControl.xaml.cs">
       <DependentUpon>CollectionUserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="EqualizerUserControl.xaml.cs">
+    <Compile Include="Controls\EqualizerUserControl.xaml.cs">
       <DependentUpon>EqualizerUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="NowPlayingUserControl.xaml">
+    <Page Include="Controls\NowPlayingUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -94,7 +94,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="VisualizerUserControl.xaml">
+    <Page Include="Controls\VisualizerUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -106,7 +106,7 @@
     <Compile Include="Models\EqualizerViewModel.cs" />
     <Compile Include="Models\MainWindowViewModel.cs" />
     <Compile Include="Models\NowPlayingViewModel.cs" />
-    <Compile Include="NowPlayingUserControl.xaml.cs">
+    <Compile Include="Controls\NowPlayingUserControl.xaml.cs">
       <DependentUpon>NowPlayingUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -156,9 +156,7 @@
   <ItemGroup>
     <Resource Include="Resources\stop.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Controls\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="Resources\delete.png" />
   </ItemGroup>
