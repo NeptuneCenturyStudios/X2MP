@@ -38,6 +38,7 @@
         </Setter>
     </Style>
 
+    <!--this style is for the playback control buttons-->
     <Style TargetType="Button" x:Key="ControlButton">
         <Setter Property="Width" Value="35" />
         <Setter Property="Height" Value="35" />
