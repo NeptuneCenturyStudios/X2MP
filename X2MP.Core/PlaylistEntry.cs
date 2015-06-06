@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 
 namespace X2MP.Core
 {
@@ -27,6 +29,7 @@ namespace X2MP.Core
         /// Gets or sets whether this entry is playing
         /// </summary>
         private bool _isPlaying { get; set; }
+        [JsonIgnore]
         public bool IsPlaying
         {
             get
@@ -35,6 +38,7 @@ namespace X2MP.Core
             }
             set
             {
+                
                 _isPlaying = value;
 
                 OnPropertyChanged("IsPlaying");
