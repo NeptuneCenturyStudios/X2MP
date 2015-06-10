@@ -23,18 +23,18 @@
                     <GridViewColumn >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Image Source="/Resources/playing.png">
-                                    <Image.Style>
-                                        <Style TargetType="Image">
+                                <TextBlock Text="&#xE102;" FontFamily="Segoe UI Symbol">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsPlaying}" Value="false">
                                                     <Setter Property="Visibility" Value="Hidden"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
-                                    </Image.Style>
+                                    </TextBlock.Style>
 
-                                </Image>
+                                </TextBlock>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
