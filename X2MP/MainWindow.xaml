@@ -13,6 +13,7 @@
         >
 
 
+
     <Window.Effect>
         <DropShadowEffect BlurRadius="25" ShadowDepth="0" />
     </Window.Effect>
@@ -22,7 +23,7 @@
 
         <Grid>
 
-            
+
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="*"/>
@@ -34,33 +35,29 @@
                     <Button x:Name="CloseButton" 
                             Style="{StaticResource ImageButton}"
                             Click="CloseButton_Click"
-                            ToolTip="Power down the player">
-                        <Image Source="/Resources/power.png"/>
-                    </Button>
+                            ToolTip="Power down the player"
+                            Content="&#xE10A;"/>
+
                     <Button Command="{Binding OpenCollection}"
                             Style="{StaticResource ImageButton}"
-                            ToolTip="Display your collection">
-                        <Image Source="/Resources/now-playing.png"/>
-                    </Button>
+                            ToolTip="Display your collection"
+                            Content="&#xE1D3;"/>
 
                     <Button Command="{Binding OpenNowPlaying}"
                             Style="{StaticResource ImageButton}"
-                            ToolTip="Display the Now Playing window">
-                        <Image Source="/Resources/now-playing.png"/>
-                    </Button>
+                            ToolTip="Display the Now Playing window"
+                            Content="&#xE189;"/>
 
                     <Button Command="{Binding OpenVisualizer}"
                             Style="{StaticResource ImageButton}"
-                            ToolTip="Display the visualizer">
-                        <Image Source="/Resources/vis.png"/>
-                    </Button>
-                    
+                            ToolTip="Display the visualizer"
+                            Content="&#xff5e;" />
+
                     <Button Command="{Binding OpenEqualizer}"
                             Style="{StaticResource ImageButton}"
-                            ToolTip="Display the equalizer">
-                        <Image Source="/Resources/equalizer.png"/>
-                    </Button>
-                    
+                            ToolTip="Display the equalizer"
+                            Content="&#x1f4ca;" />
+
                 </StackPanel>
             </Grid>
 
@@ -118,46 +115,46 @@
 
                                 <!--previous-->
                                 <Button Style="{StaticResource ControlButton}"
-                                Command="{Binding Prev}">
-                                    <Image Source="/Resources/prev.png" Stretch="None"/>
-                                </Button>
+                                        Command="{Binding Prev}"
+                                        Content="&#xE100;"/>
 
                                 <!--stop-->
                                 <Button Style="{StaticResource ControlButton}"
-                                Command="{Binding Stop}">
-                                    <Image Source="/Resources/stop.png" Stretch="None"/>
-                                </Button>
+                                        Command="{Binding Stop}"
+                                        Content="&#xE15B;" />
 
                                 <!--play / pause-->
-                                <Button Style="{StaticResource ControlButton}"
-                                Width="52"
-                                Height="52"
-                                Command="{Binding Play}"
-                                CommandParameter="0">
+                                <Button 
+                                        Width="52"
+                                        Height="52"
+                                        Command="{Binding Play}"
+                                        CommandParameter="0"
+                                        FontSize="32"
+                                        >
 
                                     <!--pause or play image, depending on player status-->
-                                    <Image Stretch="None" >
-                                        <Image.Resources>
-                                            <Style TargetType="Image">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsPlaying}" Value="false">
-                                                        <Setter Property="Source" Value="/Resources/play.png"/>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding IsPlaying}" Value="true">
-                                                        <Setter Property="Source" Value="/Resources/pause.png" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Image.Resources>
-                                    </Image>
+                                    
+                                    <Button.Resources>
+                                        <Style TargetType="Button" BasedOn="{StaticResource ControlButton}" >
+                                            <Setter Property="Content" Value="&#xE102;" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsPlaying}" Value="false">
+                                                    <Setter Property="Content" Value="&#xE102;"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsPlaying}" Value="true">
+                                                    <Setter Property="Content" Value="&#xE103;" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Resources>
+
 
                                 </Button>
 
                                 <!--next-->
                                 <Button Style="{StaticResource ControlButton}"
-                                    Command="{Binding Next}">
-                                    <Image Source="/Resources/next.png" Stretch="None"/>
-                                </Button>
+                                    Command="{Binding Next}"
+                                    Content="&#xE101;" />
 
                                 <!--repeat-->
                                 <CheckBox IsChecked="{Binding RepeatOn}" VerticalAlignment="Center">
@@ -178,7 +175,7 @@
 
             </Grid>
 
-            
+
 
         </Grid>
     </Border>

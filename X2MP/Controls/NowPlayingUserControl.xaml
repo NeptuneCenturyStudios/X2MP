@@ -46,18 +46,18 @@
                     <GridViewColumn >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Image Source="/Resources/playing.png">
-                                    <Image.Style>
-                                        <Style TargetType="Image">
+                                <TextBlock Text="&#xE102;" FontFamily="Segoe UI Symbol">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsPlaying}" Value="false">
                                                     <Setter Property="Visibility" Value="Hidden"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
-                                    </Image.Style>
+                                    </TextBlock.Style>
                                     
-                                </Image>
+                                </TextBlock>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -73,16 +73,15 @@
         <StackPanel Grid.Row="2" Orientation="Horizontal" >
             <Button Style="{StaticResource ControlButton}"
                     Command="{Binding ClearNowPlaying}"
-                    ToolTip="Clear the entire Now Playing queue">
-                <Image Source="/Resources/trash.png" Stretch="None"/>
-            </Button>
+                    ToolTip="Clear the entire Now Playing queue"
+                    Content="&#xE107;"/>
+            
             <Button Style="{StaticResource ControlButton}"
                     Command="{Binding DeleteItem}"
                     CommandParameter="{Binding SelectedItem, ElementName=NowPlayingListView}"
-                    ToolTip="Remove item from Now Playing">
-
-                <Image Source="/Resources/delete.png" Stretch="None"/>
-            </Button>
+                    ToolTip="Remove item from Now Playing"
+                    Content="&#xE106;" />
+            
         </StackPanel>
 
     </Grid>
