@@ -25,7 +25,7 @@
                                 <Setter Property="Border.Background" Value="Transparent"/>
                                 <Style.Triggers>
                                     <Trigger Property="Border.IsMouseOver" Value="True">
-                                        <Setter Property="Border.Background" Value="LightGray" />
+                                        <Setter Property="Border.Background" Value="DarkGray" />
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
@@ -293,6 +293,6 @@
     
     <!--this style is for the side menu-->
     <Style x:Key="SideMenuStyle" TargetType="{x:Type Grid}">
-        <Setter Property="Background" Value="DarkGray" />
+        <Setter Property="Background" Value="LightGray" />
     </Style>
 </ResourceDictionary>
